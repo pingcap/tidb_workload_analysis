@@ -1,0 +1,58 @@
+Alias: q4
+Query: 
+-- $ID$
+-- TPC-H/TPC-R Order Priority Checking Query (Q4)
+-- Functional Query Definition
+-- Approved February 1998
+
+
+select
+    o_orderpriority,
+    count(*) as order_count
+from
+    orders
+where
+        o_orderdate >= date '1995-07-01'
+  and o_orderdate < date '1995-07-01' + interval '3' month
+  and exists (
+        select
+            *
+        from
+            lineitem
+        where
+                l_orderkey = o_orderkey
+          and l_commitdate < l_receiptdate
+    )
+group by
+    o_orderpriority
+order by
+    o_orderpriority;
+
+Original Cost: 7.39E+07
+Optimized Cost: 7.39E+07
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+Sort_10                          1.00          73856859.62     root                           tpch.orders.o_orderpriority                                                                                                                                               
+└─Projection_12                  1.00          73856855.02     root                           tpch.orders.o_orderpriority, Column#26                                                                                                                                    
+  └─HashAgg_13                   1.00          73856854.82     root                           group by:tpch.orders.o_orderpriority, funcs:count(1)->Column#26, funcs:firstrow(tpch.orders.o_orderpriority)->tpch.orders.o_orderpriority                                 
+    └─IndexJoin_21               46544.53      71992634.03     root                           semi join, inner:TableReader_17, outer key:tpch.orders.o_orderkey, inner key:tpch.lineitem.l_orderkey, equal cond:eq(tpch.orders.o_orderkey, tpch.lineitem.l_orderkey)    
+      ├─TableReader_35(Build)    58180.67      42390435.59     root                           data:Selection_34                                                                                                                                                         
+      │ └─Selection_34           58180.67      625219176.38    cop[tikv]                      ge(tpch.orders.o_orderdate, 1995-07-01), lt(tpch.orders.o_orderdate, 1995-10-01)                                                                                          
+      │   └─TableFullScan_33     1500000.00    475519176.38    cop[tikv]    table:orders      keep order:false                                                                                                                                                          
+      └─TableReader_17(Probe)    46544.53      30.60           root                           data:Selection_16                                                                                                                                                         
+        └─Selection_16           46544.53      383.02          cop[tikv]                      lt(tpch.lineitem.l_commitdate, tpch.lineitem.l_receiptdate)                                                                                                               
+          └─TableRangeScan_15    58180.67      333.12          cop[tikv]    table:lineitem    range: decided by [eq(tpch.lineitem.l_orderkey, tpch.orders.o_orderkey)], keep order:false                                                                                
+
+===================== optimized plan =====================
+Sort_10                          1.00          73856859.62     root                           tpch.orders.o_orderpriority                                                                                                                                               
+└─Projection_12                  1.00          73856855.02     root                           tpch.orders.o_orderpriority, Column#26                                                                                                                                    
+  └─HashAgg_13                   1.00          73856854.82     root                           group by:tpch.orders.o_orderpriority, funcs:count(1)->Column#26, funcs:firstrow(tpch.orders.o_orderpriority)->tpch.orders.o_orderpriority                                 
+    └─IndexJoin_21               46544.53      71992634.03     root                           semi join, inner:TableReader_17, outer key:tpch.orders.o_orderkey, inner key:tpch.lineitem.l_orderkey, equal cond:eq(tpch.orders.o_orderkey, tpch.lineitem.l_orderkey)    
+      ├─TableReader_35(Build)    58180.67      42390435.59     root                           data:Selection_34                                                                                                                                                         
+      │ └─Selection_34           58180.67      625219176.38    cop[tikv]                      ge(tpch.orders.o_orderdate, 1995-07-01), lt(tpch.orders.o_orderdate, 1995-10-01)                                                                                          
+      │   └─TableFullScan_33     1500000.00    475519176.38    cop[tikv]    table:orders      keep order:false                                                                                                                                                          
+      └─TableReader_17(Probe)    46544.53      30.60           root                           data:Selection_16                                                                                                                                                         
+        └─Selection_16           46544.53      383.02          cop[tikv]                      lt(tpch.lineitem.l_commitdate, tpch.lineitem.l_receiptdate)                                                                                                               
+          └─TableRangeScan_15    58180.67      333.12          cop[tikv]    table:lineitem    range: decided by [eq(tpch.lineitem.l_orderkey, tpch.orders.o_orderkey)], keep order:false                                                                                

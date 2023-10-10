@@ -1,0 +1,45 @@
+Total Queries in the workload: 10
+Total number of indexes: 7
+  CREATE INDEX idx_block_number ON ethereum.receipts (block_number);
+  CREATE INDEX idx_from_address_block_number_token_address ON ethereum.token_transfers (from_address, block_number, token_address);
+  CREATE INDEX idx_token_address ON ethereum.token_transfers (token_address);
+  CREATE INDEX idx_block_number ON ethereum.transactions (block_number);
+  CREATE INDEX idx_from_address ON ethereum.transactions (from_address);
+  CREATE INDEX idx_hash ON ethereum.transactions (hash);
+  CREATE INDEX idx_to_address_block_timestamp_value ON ethereum.transactions (to_address, block_timestamp, value);
+Total original workload cost: 1.05E+10
+Total optimized workload cost: 2.65E+09
+Total cost reduction ratio: 74.68%
+Top 10 queries with the most cost reduction ratio:
+  Alias: q4, Cost Reduction Ratio: 1.39E+08->6.04E+03(0.00)
+  Alias: q9, Cost Reduction Ratio: 2.77E+08->1.85E+04(0.00)
+  Alias: q5, Cost Reduction Ratio: 1.39E+08->8.95E+04(0.00)
+  Alias: q6, Cost Reduction Ratio: 6.72E+08->2.03E+06(0.00)
+  Alias: q8, Cost Reduction Ratio: 9.62E+08->8.02E+06(0.01)
+  Alias: q1, Cost Reduction Ratio: 7.24E+08->4.76E+07(0.07)
+  Alias: q2, Cost Reduction Ratio: 6.72E+08->1.44E+08(0.21)
+  Alias: q10, Cost Reduction Ratio: 4.72E+09->1.13E+09(0.24)
+  Alias: q3, Cost Reduction Ratio: 7.51E+08->1.92E+08(0.26)
+  Alias: q7, Cost Reduction Ratio: 1.41E+09->1.13E+09(0.80)
+Top 10 queries with the most cost reduction number:
+  Alias: q10, Cost Reduction Ratio: 4.72E+09->1.13E+09(0.24)
+  Alias: q8, Cost Reduction Ratio: 9.62E+08->8.02E+06(0.01)
+  Alias: q1, Cost Reduction Ratio: 7.24E+08->4.76E+07(0.07)
+  Alias: q6, Cost Reduction Ratio: 6.72E+08->2.03E+06(0.00)
+  Alias: q3, Cost Reduction Ratio: 7.51E+08->1.92E+08(0.26)
+  Alias: q2, Cost Reduction Ratio: 6.72E+08->1.44E+08(0.21)
+  Alias: q7, Cost Reduction Ratio: 1.41E+09->1.13E+09(0.80)
+  Alias: q9, Cost Reduction Ratio: 2.77E+08->1.85E+04(0.00)
+  Alias: q4, Cost Reduction Ratio: 1.39E+08->6.04E+03(0.00)
+  Alias: q5, Cost Reduction Ratio: 1.39E+08->8.95E+04(0.00)
+Top 10 queries with the most cost:
+  Alias: q10, Cost Reduction Ratio: 4.72E+09->1.13E+09(0.24)
+  Alias: q7, Cost Reduction Ratio: 1.41E+09->1.13E+09(0.80)
+  Alias: q8, Cost Reduction Ratio: 9.62E+08->8.02E+06(0.01)
+  Alias: q3, Cost Reduction Ratio: 7.51E+08->1.92E+08(0.26)
+  Alias: q2, Cost Reduction Ratio: 6.72E+08->1.44E+08(0.21)
+  Alias: q1, Cost Reduction Ratio: 7.24E+08->4.76E+07(0.07)
+  Alias: q6, Cost Reduction Ratio: 6.72E+08->2.03E+06(0.00)
+  Alias: q9, Cost Reduction Ratio: 2.77E+08->1.85E+04(0.00)
+  Alias: q4, Cost Reduction Ratio: 1.39E+08->6.04E+03(0.00)
+  Alias: q5, Cost Reduction Ratio: 1.39E+08->8.95E+04(0.00)

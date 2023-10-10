@@ -1,0 +1,49 @@
+Alias: q14
+Query: 
+-- $ID$
+-- TPC-H/TPC-R Promotion Effect Query (Q14)
+-- Functional Query Definition
+-- Approved February 1998
+
+
+select
+            100.00 * sum(case
+                             when p_type like 'PROMO%'
+                                 then l_extendedprice * (1 - l_discount)
+                             else 0
+            end) / sum(l_extendedprice * (1 - l_discount)) as promo_revenue
+from
+    lineitem,
+    part
+where
+        l_partkey = p_partkey
+  and l_shipdate >= date '1993-04-01'
+  and l_shipdate < date '1993-04-01' + interval '1' month;
+
+Original Cost: 2.76E+08
+Optimized Cost: 1.17E+08
+Cost Reduction Ratio: 0.43
+
+
+===================== original plan =====================
+Projection_8                     1.00          275943137.76     root                           div(mul(100.00, Column#26), Column#27)->Column#28                                                                                                                                                                    
+└─HashAgg_9                      1.00          275943127.78     root                           funcs:sum(Column#30)->Column#26, funcs:sum(Column#31)->Column#27                                                                                                                                                     
+  └─Projection_38                100484.81     274938779.23     root                           case(like(tpch.part.p_type, PROMO%, 92), mul(tpch.lineitem.l_extendedprice, minus(1, tpch.lineitem.l_discount)), 0)->Column#30, mul(tpch.lineitem.l_extendedprice, minus(1, tpch.lineitem.l_discount))->Column#31    
+    └─HashJoin_21                100484.81     272933102.49     root                           inner join, equal:[eq(tpch.lineitem.l_partkey, tpch.part.p_partkey)]                                                                                                                                                 
+      ├─TableReader_24(Build)    98957.44      250014713.76     root                           data:Selection_23                                                                                                                                                                                                    
+      │ └─Selection_23           98957.44      3700061160.50    cop[tikv]                      ge(tpch.lineitem.l_shipdate, 1993-04-01), lt(tpch.lineitem.l_shipdate, 1993-05-01)                                                                                                                                   
+      │   └─TableFullScan_22     8143998.00    2887290160.10    cop[tikv]    table:lineitem    keep order:false                                                                                                                                                                                                     
+      └─TableReader_26(Probe)    200000.00     6515629.06       root                           data:TableFullScan_25                                                                                                                                                                                                
+        └─TableFullScan_25       200000.00     65127795.85      cop[tikv]    table:part        keep order:false                                                                                                                                                                                                     
+
+===================== optimized plan =====================
+Projection_8                            1.00         117439750.68    root                                                                                                         div(mul(100.00, Column#26), Column#27)->Column#28                                                                                                                                                                    
+└─HashAgg_9                             1.00         117439740.70    root                                                                                                         funcs:sum(Column#35)->Column#26, funcs:sum(Column#36)->Column#27                                                                                                                                                     
+  └─Projection_75                       100484.81    116435392.15    root                                                                                                         case(like(tpch.part.p_type, PROMO%, 92), mul(tpch.lineitem.l_extendedprice, minus(1, tpch.lineitem.l_discount)), 0)->Column#35, mul(tpch.lineitem.l_extendedprice, minus(1, tpch.lineitem.l_discount))->Column#36    
+    └─IndexJoin_26                      100484.81    114429715.41    root                                                                                                         inner join, inner:Projection_25, outer key:tpch.part.p_partkey, inner key:tpch.lineitem.l_partkey, equal cond:eq(tpch.part.p_partkey, tpch.lineitem.l_partkey)                                                       
+      ├─TableReader_48(Build)           200000.00    6515629.06      root                                                                                                         data:TableFullScan_47                                                                                                                                                                                                
+      │ └─TableFullScan_47              200000.00    65127795.85     cop[tikv]    table:part                                                                                      keep order:false                                                                                                                                                                                                     
+      └─Projection_25(Probe)            100484.81    989.29          root                                                                                                         tpch.lineitem.l_partkey, tpch.lineitem.l_extendedprice, tpch.lineitem.l_discount, tpch.lineitem.l_shipdate                                                                                                           
+        └─IndexLookUp_24                100484.81    989.09          root                                                                                                                                                                                                                                                                                                                              
+          ├─IndexRangeScan_22(Build)    100484.81    130.00          cop[tikv]    table:lineitem, index:idx_l_partkey_l_shipdate_l_shipmode(L_PARTKEY, L_SHIPDATE, L_SHIPMODE)    range: decided by [eq(tpch.lineitem.l_partkey, tpch.part.p_partkey) ge(tpch.lineitem.l_shipdate, 1993-04-01) lt(tpch.lineitem.l_shipdate, 1993-05-01)], keep order:false                                             
+          └─TableRowIDScan_23(Probe)    100484.81    178.12          cop[tikv]    table:lineitem                                                                                  keep order:false                                                                                                                                                                                                     

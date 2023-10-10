@@ -1,0 +1,425 @@
+{
+ "columns": {
+  "w_city": {
+   "histogram": {
+    "ndv": 1
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "AUZhaXJ2aWV3/wAAAAAAAAAA9w==",
+      "count": 5
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 45,
+   "last_update_version": 442619554576203788,
+   "correlation": 1
+  },
+  "w_country": {
+   "histogram": {
+    "ndv": 1
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "AVVuaXRlZCBT/3RhdGVzAAAA/A==",
+      "count": 5
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 70,
+   "last_update_version": 442619554576203788,
+   "correlation": 1
+  },
+  "w_county": {
+   "histogram": {
+    "ndv": 1
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "AVdpbGxpYW1z/29uIENvdW50/3kAAAAAAAAA+A==",
+      "count": 5
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 90,
+   "last_update_version": 442619554576203788,
+   "correlation": 1
+  },
+  "w_gmt_offset": {
+   "histogram": {
+    "ndv": 2
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "BgUCf/r/",
+      "count": 4
+     },
+     {
+      "data": "BgUCgAAA",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 25,
+   "last_update_version": 442619554576203788,
+   "correlation": 1
+  },
+  "w_state": {
+   "histogram": {
+    "ndv": 1
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "AVROAAAAAAAA+Q==",
+      "count": 5
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 15,
+   "last_update_version": 442619554576203788,
+   "correlation": 1
+  },
+  "w_street_name": {
+   "histogram": {
+    "ndv": 5
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "AQAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "ATZ0aAAAAAAA+g==",
+      "count": 1
+     },
+     {
+      "data": "AUFzaCBMYXVy/2VsAAAAAAAA+Q==",
+      "count": 1
+     },
+     {
+      "data": "AVZpZXcgRmly/3N0AAAAAAAA+Q==",
+      "count": 1
+     },
+     {
+      "data": "AVdpbHNvbiBF/2xtAAAAAAAA+Q==",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 39,
+   "last_update_version": 442619554576203788,
+   "correlation": -0.1
+  },
+  "w_street_number": {
+   "histogram": {
+    "ndv": 5
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "AQAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "ATM2OAAAAAAA+g==",
+      "count": 1
+     },
+     {
+      "data": "ATUzNAAAAAAA+g==",
+      "count": 1
+     },
+     {
+      "data": "ATYwMAAAAAAA+g==",
+      "count": 1
+     },
+     {
+      "data": "ATY1MQAAAAAA+g==",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 17,
+   "last_update_version": 442619554576203788,
+   "correlation": -1
+  },
+  "w_street_type": {
+   "histogram": {
+    "ndv": 5
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "AQAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "AUF2ZW51ZQAA/Q==",
+      "count": 1
+     },
+     {
+      "data": "AURyLgAAAAAA+g==",
+      "count": 1
+     },
+     {
+      "data": "AURyaXZlAAAA/A==",
+      "count": 1
+     },
+     {
+      "data": "AVBhcmt3YXkA/g==",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 26,
+   "last_update_version": 442619554576203788,
+   "correlation": -0.6
+  },
+  "w_suite_number": {
+   "histogram": {
+    "ndv": 5
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "AQAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "AVN1aXRlIDAA/g==",
+      "count": 1
+     },
+     {
+      "data": "AVN1aXRlIDQ3/zAAAAAAAAAA+A==",
+      "count": 1
+     },
+     {
+      "data": "AVN1aXRlIDgw/wAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "AVN1aXRlIFAA/g==",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 36,
+   "last_update_version": 442619554576203788,
+   "correlation": -0.5
+  },
+  "w_warehouse_id": {
+   "histogram": {
+    "ndv": 5
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "AUFBQUFBQUFB/0JBQUFBQUFB/wAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "AUFBQUFBQUFB/0NBQUFBQUFB/wAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "AUFBQUFBQUFB/0RBQUFBQUFB/wAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "AUFBQUFBQUFB/0VBQUFBQUFB/wAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "AUFBQUFBQUFB/0ZBQUFBQUFB/wAAAAAAAAAA9w==",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 85,
+   "last_update_version": 442619554576203788,
+   "correlation": 1
+  },
+  "w_warehouse_name": {
+   "histogram": {
+    "ndv": 5
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "AQAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "AUJhZCBjYXJk/3MgbXVzdCBt/2FrZS4AAAAA+w==",
+      "count": 1
+     },
+     {
+      "data": "AUNvbnZlbnRp/29uYWwgY2hp/2xkcgAAAAAA+g==",
+      "count": 1
+     },
+     {
+      "data": "AURvb3JzIGNh/25ubwAAAAAA+g==",
+      "count": 1
+     },
+     {
+      "data": "AUltcG9ydGFu/3QgaXNzdWVz/yBsaXYAAAAA+w==",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 75,
+   "last_update_version": 442619554576203788,
+   "correlation": -0.7
+  },
+  "w_warehouse_sk": {
+   "histogram": {
+    "ndv": 5
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "A4AAAAAAAAAB",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAC",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAD",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAE",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAF",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 40,
+   "last_update_version": 442619554576203788,
+   "correlation": 1
+  },
+  "w_warehouse_sq_ft": {
+   "histogram": {
+    "ndv": 5
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "A4AAAAAAAAAA",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAh0I",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAABH1i",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAACXqy",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAADut7",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 40,
+   "last_update_version": 442619554576203788,
+   "correlation": -0.6
+  },
+  "w_zip": {
+   "histogram": {
+    "ndv": 1
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "ATM1NzA5AAAA/A==",
+      "count": 5
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 30,
+   "last_update_version": 442619554576203788,
+   "correlation": 1
+  }
+ },
+ "indices": {},
+ "partitions": null,
+ "database_name": "tpcds",
+ "table_name": "warehouse",
+ "ext_stats": null,
+ "count": 5,
+ "modify_count": 0,
+ "version": 442619554576203788,
+ "is_historical_stats": false
+}

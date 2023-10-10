@@ -1,0 +1,41 @@
+{
+ "columns": {
+  "a": {
+   "histogram": {
+    "ndv": 3
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "A4AAAAAAAAAB",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAC",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAD",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 24,
+   "last_update_version": 444389259416698890,
+   "correlation": -1
+  }
+ },
+ "indices": {},
+ "partitions": null,
+ "database_name": "test",
+ "table_name": "t",
+ "ext_stats": null,
+ "count": 3,
+ "modify_count": 0,
+ "version": 444389259416698890,
+ "is_historical_stats": false
+}

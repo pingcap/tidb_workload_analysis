@@ -1,0 +1,47 @@
+Total Queries in the workload: 113
+Total number of indexes: 9
+  CREATE INDEX idx_movie_id_person_id ON imdbload_no_fk.cast_info (movie_id, person_id);
+  CREATE INDEX idx_person_id ON imdbload_no_fk.cast_info (person_id);
+  CREATE INDEX idx_role_id ON imdbload_no_fk.cast_info (role_id);
+  CREATE INDEX idx_movie_id_company_id_company_type_id ON imdbload_no_fk.movie_companies (movie_id, company_id, company_type_id);
+  CREATE INDEX idx_info_type_id ON imdbload_no_fk.movie_info (info_type_id);
+  CREATE INDEX idx_movie_id_info_type_id ON imdbload_no_fk.movie_info (movie_id, info_type_id);
+  CREATE INDEX idx_movie_id_info_type_id ON imdbload_no_fk.movie_info_idx (movie_id, info_type_id);
+  CREATE INDEX idx_keyword_id_movie_id ON imdbload_no_fk.movie_keyword (keyword_id, movie_id);
+  CREATE INDEX idx_movie_id_keyword_id ON imdbload_no_fk.movie_keyword (movie_id, keyword_id);
+Total original workload cost: 1.37E+11
+Total optimized workload cost: 4.22E+10
+Total cost reduction ratio: 69.28%
+Top 10 queries with the most cost reduction ratio:
+  Alias: 18b, Cost Reduction Ratio: 8.14E+08->1.43E+04(0.00)
+  Alias: 17a, Cost Reduction Ratio: 1.78E+09->3.01E+06(0.00)
+  Alias: 17c, Cost Reduction Ratio: 1.78E+09->3.01E+06(0.00)
+  Alias: 17b, Cost Reduction Ratio: 1.78E+09->3.01E+06(0.00)
+  Alias: 17e, Cost Reduction Ratio: 1.78E+09->3.02E+06(0.00)
+  Alias: 17d, Cost Reduction Ratio: 1.78E+09->3.02E+06(0.00)
+  Alias: 17f, Cost Reduction Ratio: 1.78E+09->3.02E+06(0.00)
+  Alias: 6c, Cost Reduction Ratio: 1.42E+09->2.72E+06(0.00)
+  Alias: 6a, Cost Reduction Ratio: 1.42E+09->2.72E+06(0.00)
+  Alias: 6e, Cost Reduction Ratio: 1.42E+09->2.72E+06(0.00)
+Top 10 queries with the most cost reduction number:
+  Alias: 26c, Cost Reduction Ratio: 2.18E+09->4.87E+07(0.02)
+  Alias: 26b, Cost Reduction Ratio: 2.13E+09->8.74E+07(0.04)
+  Alias: 26a, Cost Reduction Ratio: 2.21E+09->1.70E+08(0.08)
+  Alias: 20a, Cost Reduction Ratio: 1.85E+09->4.76E+07(0.03)
+  Alias: 20b, Cost Reduction Ratio: 1.85E+09->4.80E+07(0.03)
+  Alias: 20c, Cost Reduction Ratio: 1.85E+09->4.80E+07(0.03)
+  Alias: 16d, Cost Reduction Ratio: 1.82E+09->4.65E+07(0.03)
+  Alias: 16a, Cost Reduction Ratio: 1.82E+09->4.65E+07(0.03)
+  Alias: 16c, Cost Reduction Ratio: 1.82E+09->4.65E+07(0.03)
+  Alias: 16b, Cost Reduction Ratio: 1.82E+09->4.65E+07(0.03)
+Top 10 queries with the most cost:
+  Alias: 10c, Cost Reduction Ratio: 2.21E+09->1.96E+09(0.89)
+  Alias: 29c, Cost Reduction Ratio: 2.06E+09->1.10E+09(0.54)
+  Alias: 24a, Cost Reduction Ratio: 1.89E+09->1.07E+09(0.56)
+  Alias: 15d, Cost Reduction Ratio: 2.01E+09->7.88E+08(0.39)
+  Alias: 15a, Cost Reduction Ratio: 1.66E+09->1.13E+09(0.68)
+  Alias: 19d, Cost Reduction Ratio: 1.89E+09->8.90E+08(0.47)
+  Alias: 15c, Cost Reduction Ratio: 1.61E+09->9.84E+08(0.61)
+  Alias: 19a, Cost Reduction Ratio: 1.52E+09->1.02E+09(0.67)
+  Alias: 19c, Cost Reduction Ratio: 1.52E+09->1.02E+09(0.67)
+  Alias: 19b, Cost Reduction Ratio: 1.48E+09->1.01E+09(0.68)

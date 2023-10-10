@@ -1,0 +1,36 @@
+Alias: q6
+Query: 
+-- $ID$
+-- TPC-H/TPC-R Forecasting Revenue Change Query (Q6)
+-- Functional Query Definition
+-- Approved February 1998
+
+
+select
+    sum(l_extendedprice * l_discount) as revenue
+from
+    lineitem
+where
+        l_shipdate >= date '1993-01-01'
+  and l_shipdate < date '1993-01-01' + interval '1' year
+  and l_discount between 0.07 - 0.01 and 0.07 + 0.01
+  and l_quantity < 25;
+
+Original Cost: 3.28E+08
+Optimized Cost: 3.28E+08
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+HashAgg_13                  1.00          328164043.31     root                           funcs:sum(Column#18)->Column#17                                                                                                                                                                 
+└─TableReader_14            1.00          328162514.77     root                           data:HashAgg_6                                                                                                                                                                                  
+  └─HashAgg_6               1.00          4922437563.12    cop[tikv]                      funcs:sum(mul(tpch.lineitem.l_extendedprice, tpch.lineitem.l_discount))->Column#18                                                                                                              
+    └─Selection_12          161242.16     4919217661.10    cop[tikv]                      ge(tpch.lineitem.l_discount, 0.06), ge(tpch.lineitem.l_shipdate, 1993-01-01), le(tpch.lineitem.l_discount, 0.08), lt(tpch.lineitem.l_quantity, 25), lt(tpch.lineitem.l_shipdate, 1994-01-01)    
+      └─TableFullScan_11    8143998.00    2887290160.10    cop[tikv]    table:lineitem    keep order:false                                                                                                                                                                                
+
+===================== optimized plan =====================
+HashAgg_13                  1.00          328164043.31     root                           funcs:sum(Column#18)->Column#17                                                                                                                                                                 
+└─TableReader_14            1.00          328162514.77     root                           data:HashAgg_6                                                                                                                                                                                  
+  └─HashAgg_6               1.00          4922437563.12    cop[tikv]                      funcs:sum(mul(tpch.lineitem.l_extendedprice, tpch.lineitem.l_discount))->Column#18                                                                                                              
+    └─Selection_12          161242.16     4919217661.10    cop[tikv]                      ge(tpch.lineitem.l_discount, 0.06), ge(tpch.lineitem.l_shipdate, 1993-01-01), le(tpch.lineitem.l_discount, 0.08), lt(tpch.lineitem.l_quantity, 25), lt(tpch.lineitem.l_shipdate, 1994-01-01)    
+      └─TableFullScan_11    8143998.00    2887290160.10    cop[tikv]    table:lineitem    keep order:false                                                                                                                                                                                

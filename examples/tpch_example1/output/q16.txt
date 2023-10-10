@@ -1,0 +1,75 @@
+Alias: q16
+Query: 
+-- $ID$
+-- TPC-H/TPC-R Parts/Supplier Relationship Query (Q16)
+-- Functional Query Definition
+-- Approved February 1998
+
+
+select
+    p_brand,
+    p_type,
+    p_size,
+    count(distinct ps_suppkey) as supplier_cnt
+from
+    partsupp,
+    part
+where
+        p_partkey = ps_partkey
+  and p_brand <> 'Brand#41'
+  and p_type not like 'MEDIUM BURNISHED%'
+  and p_size in (4, 22, 35, 31, 47, 44, 30, 11)
+  and ps_suppkey not in (
+    select
+        s_suppkey
+    from
+        supplier
+    where
+            s_comment like '%Customer%Complaints%'
+)
+group by
+    p_brand,
+    p_type,
+    p_size
+order by
+    supplier_cnt desc,
+    p_brand,
+    p_type,
+    p_size;
+
+Original Cost: 2.92E+07
+Optimized Cost: 2.92E+07
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+Sort_14                              26.81        29156656.63    root                           Column#22:desc, tpch.part.p_brand, tpch.part.p_type, tpch.part.p_size                                                                                                                                                                                                                      
+└─Projection_16                      26.81        29150036.55    root                           tpch.part.p_brand, tpch.part.p_type, tpch.part.p_size, Column#22                                                                                                                                                                                                                           
+  └─HashAgg_17                       26.81        29150025.84    root                           group by:tpch.part.p_brand, tpch.part.p_size, tpch.part.p_type, funcs:count(distinct tpch.partsupp.ps_suppkey)->Column#22, funcs:firstrow(tpch.part.p_brand)->tpch.part.p_brand, funcs:firstrow(tpch.part.p_type)->tpch.part.p_type, funcs:firstrow(tpch.part.p_size)->tpch.part.p_size    
+    └─HashJoin_29                    79970.54     22738612.94    root                           anti semi join, equal:[eq(tpch.partsupp.ps_suppkey, tpch.supplier.s_suppkey)]                                                                                                                                                                                                              
+      ├─TableReader_66(Build)        8000.00      422093.83      root                           data:Selection_65                                                                                                                                                                                                                                                                          
+      │ └─Selection_65               8000.00      3731746.60     cop[tikv]                      like(tpch.supplier.s_comment, "%Customer%Complaints%", 92)                                                                                                                                                                                                                                 
+      │   └─TableFullScan_64         10000.00     3232746.60     cop[tikv]    table:supplier    keep order:false                                                                                                                                                                                                                                                                           
+      └─Projection_30(Probe)         99963.17     19390061.15    root                           tpch.partsupp.ps_suppkey, tpch.part.p_brand, tpch.part.p_type, tpch.part.p_size                                                                                                                                                                                                            
+        └─IndexJoin_36               99963.17     19350155.85    root                           inner join, inner:TableReader_33, outer key:tpch.part.p_partkey, inner key:tpch.partsupp.ps_partkey, equal cond:eq(tpch.part.p_partkey, tpch.partsupp.ps_partkey)                                                                                                                          
+          ├─TableReader_61(Build)    24610.93     6786311.24     root                           data:Selection_60                                                                                                                                                                                                                                                                          
+          │ └─Selection_60           24610.93     94875058.58    cop[tikv]                      in(tpch.part.p_size, 4, 22, 35, 31, 47, 44, 30, 11), ne(tpch.part.p_brand, "Brand#41"), not(like(tpch.part.p_type, "MEDIUM BURNISHED%", 92))                                                                                                                                               
+          │   └─TableFullScan_59     200000.00    64935058.58    cop[tikv]    table:part        keep order:false                                                                                                                                                                                                                                                                           
+          └─TableReader_33(Probe)    24610.93     24.53          root                           data:TableRangeScan_32                                                                                                                                                                                                                                                                     
+            └─TableRangeScan_32      24610.93     304.59         cop[tikv]    table:partsupp    range: decided by [eq(tpch.partsupp.ps_partkey, tpch.part.p_partkey)], keep order:false                                                                                                                                                                                                    
+
+===================== optimized plan =====================
+Sort_14                              26.81        29156656.63    root                           Column#22:desc, tpch.part.p_brand, tpch.part.p_type, tpch.part.p_size                                                                                                                                                                                                                      
+└─Projection_16                      26.81        29150036.55    root                           tpch.part.p_brand, tpch.part.p_type, tpch.part.p_size, Column#22                                                                                                                                                                                                                           
+  └─HashAgg_17                       26.81        29150025.84    root                           group by:tpch.part.p_brand, tpch.part.p_size, tpch.part.p_type, funcs:count(distinct tpch.partsupp.ps_suppkey)->Column#22, funcs:firstrow(tpch.part.p_brand)->tpch.part.p_brand, funcs:firstrow(tpch.part.p_type)->tpch.part.p_type, funcs:firstrow(tpch.part.p_size)->tpch.part.p_size    
+    └─HashJoin_30                    79970.54     22738612.94    root                           anti semi join, equal:[eq(tpch.partsupp.ps_suppkey, tpch.supplier.s_suppkey)]                                                                                                                                                                                                              
+      ├─TableReader_86(Build)        8000.00      422093.83      root                           data:Selection_85                                                                                                                                                                                                                                                                          
+      │ └─Selection_85               8000.00      3731746.60     cop[tikv]                      like(tpch.supplier.s_comment, "%Customer%Complaints%", 92)                                                                                                                                                                                                                                 
+      │   └─TableFullScan_84         10000.00     3232746.60     cop[tikv]    table:supplier    keep order:false                                                                                                                                                                                                                                                                           
+      └─Projection_48(Probe)         99963.17     19390061.15    root                           tpch.partsupp.ps_suppkey, tpch.part.p_brand, tpch.part.p_type, tpch.part.p_size                                                                                                                                                                                                            
+        └─IndexJoin_54               99963.17     19350155.85    root                           inner join, inner:TableReader_51, outer key:tpch.part.p_partkey, inner key:tpch.partsupp.ps_partkey, equal cond:eq(tpch.part.p_partkey, tpch.partsupp.ps_partkey)                                                                                                                          
+          ├─TableReader_79(Build)    24610.93     6786311.24     root                           data:Selection_78                                                                                                                                                                                                                                                                          
+          │ └─Selection_78           24610.93     94875058.58    cop[tikv]                      in(tpch.part.p_size, 4, 22, 35, 31, 47, 44, 30, 11), ne(tpch.part.p_brand, "Brand#41"), not(like(tpch.part.p_type, "MEDIUM BURNISHED%", 92))                                                                                                                                               
+          │   └─TableFullScan_77     200000.00    64935058.58    cop[tikv]    table:part        keep order:false                                                                                                                                                                                                                                                                           
+          └─TableReader_51(Probe)    24610.93     24.53          root                           data:TableRangeScan_50                                                                                                                                                                                                                                                                     
+            └─TableRangeScan_50      24610.93     304.59         cop[tikv]    table:partsupp    range: decided by [eq(tpch.partsupp.ps_partkey, tpch.part.p_partkey)], keep order:false                                                                                                                                                                                                    

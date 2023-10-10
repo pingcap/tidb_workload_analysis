@@ -1,0 +1,65 @@
+{
+ "columns": {
+  "a": {
+   "histogram": {
+    "ndv": 2
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "A4AAAAAAAAAB",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAC",
+      "count": 3
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 34,
+   "last_update_version": 444389259626938378,
+   "correlation": 1
+  },
+  "b": {
+   "histogram": {
+    "ndv": 3
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "A4AAAAAAAAAB",
+      "count": 2
+     },
+     {
+      "data": "A4AAAAAAAAAC",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAD",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 34,
+   "last_update_version": 444389259626938378,
+   "correlation": 1
+  }
+ },
+ "indices": {},
+ "partitions": null,
+ "database_name": "test",
+ "table_name": "ta",
+ "ext_stats": null,
+ "count": 6,
+ "modify_count": 2,
+ "version": 444389274136346625,
+ "is_historical_stats": false
+}

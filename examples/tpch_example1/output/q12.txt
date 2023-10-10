@@ -1,0 +1,67 @@
+Alias: q12
+Query: 
+-- $ID$
+-- TPC-H/TPC-R Shipping Modes and Order Priority Query (Q12)
+-- Functional Query Definition
+-- Approved February 1998
+
+
+select
+    l_shipmode,
+    sum(case
+            when o_orderpriority = '1-URGENT'
+                or o_orderpriority = '2-HIGH'
+                then 1
+            else 0
+        end) as high_line_count,
+    sum(case
+            when o_orderpriority <> '1-URGENT'
+                and o_orderpriority <> '2-HIGH'
+                then 1
+            else 0
+        end) as low_line_count
+from
+    orders,
+    lineitem
+where
+        o_orderkey = l_orderkey
+  and l_shipmode in ('FOB', 'REG AIR')
+  and l_commitdate < l_receiptdate
+  and l_shipdate < l_commitdate
+  and l_receiptdate >= date '1993-01-01'
+  and l_receiptdate < date '1993-01-01' + interval '1' year
+group by
+    l_shipmode
+order by
+    l_shipmode;
+
+Original Cost: 3.92E+08
+Optimized Cost: 3.92E+08
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+Sort_10                              1.00          391773434.98     root                           tpch.lineitem.l_shipmode                                                                                                                                                                                                                                                                                                                                           
+└─Projection_12                      1.00          391773416.98     root                           tpch.lineitem.l_shipmode, Column#26, Column#27                                                                                                                                                                                                                                                                                                                     
+  └─HashAgg_13                       1.00          391773416.68     root                           group by:Column#31, funcs:sum(Column#28)->Column#26, funcs:sum(Column#29)->Column#27, funcs:firstrow(Column#30)->tpch.lineitem.l_shipmode                                                                                                                                                                                                                          
+    └─Projection_49                  284118.20     383293752.11     root                           cast(case(or(eq(tpch.orders.o_orderpriority, 1-URGENT), eq(tpch.orders.o_orderpriority, 2-HIGH)), 1, 0), decimal(20,0) BINARY)->Column#28, cast(case(and(ne(tpch.orders.o_orderpriority, 1-URGENT), ne(tpch.orders.o_orderpriority, 2-HIGH)), 1, 0), decimal(20,0) BINARY)->Column#29, tpch.lineitem.l_shipmode->Column#30, tpch.lineitem.l_shipmode->Column#31    
+      └─Projection_14                284118.20     377566042.78     root                           tpch.orders.o_orderpriority, tpch.lineitem.l_shipmode                                                                                                                                                                                                                                                                                                              
+        └─MergeJoin_15               284118.20     377509332.79     root                           inner join, left key:tpch.lineitem.l_orderkey, right key:tpch.orders.o_orderkey                                                                                                                                                                                                                                                                                    
+          ├─TableReader_42(Build)    1500000.00    43648598.43      root                           data:TableFullScan_41                                                                                                                                                                                                                                                                                                                                              
+          │ └─TableFullScan_41       1500000.00    475519176.38     cop[tikv]    table:orders      keep order:true                                                                                                                                                                                                                                                                                                                                                    
+          └─TableReader_40(Probe)    281772.52     332971629.87     root                           data:Selection_39                                                                                                                                                                                                                                                                                                                                                  
+            └─Selection_39           281772.52     4911021906.97    cop[tikv]                      ge(tpch.lineitem.l_receiptdate, 1993-01-01), in(tpch.lineitem.l_shipmode, "FOB", "REG AIR"), lt(tpch.lineitem.l_commitdate, tpch.lineitem.l_receiptdate), lt(tpch.lineitem.l_receiptdate, 1994-01-01), lt(tpch.lineitem.l_shipdate, tpch.lineitem.l_commitdate)                                                                                                    
+              └─TableFullScan_38     8143998.00    2879094405.97    cop[tikv]    table:lineitem    keep order:true                                                                                                                                                                                                                                                                                                                                                    
+
+===================== optimized plan =====================
+Sort_10                              1.00          391773434.98     root                           tpch.lineitem.l_shipmode                                                                                                                                                                                                                                                                                                                                           
+└─Projection_12                      1.00          391773416.98     root                           tpch.lineitem.l_shipmode, Column#26, Column#27                                                                                                                                                                                                                                                                                                                     
+  └─HashAgg_13                       1.00          391773416.68     root                           group by:Column#31, funcs:sum(Column#28)->Column#26, funcs:sum(Column#29)->Column#27, funcs:firstrow(Column#30)->tpch.lineitem.l_shipmode                                                                                                                                                                                                                          
+    └─Projection_49                  284118.20     383293752.11     root                           cast(case(or(eq(tpch.orders.o_orderpriority, 1-URGENT), eq(tpch.orders.o_orderpriority, 2-HIGH)), 1, 0), decimal(20,0) BINARY)->Column#28, cast(case(and(ne(tpch.orders.o_orderpriority, 1-URGENT), ne(tpch.orders.o_orderpriority, 2-HIGH)), 1, 0), decimal(20,0) BINARY)->Column#29, tpch.lineitem.l_shipmode->Column#30, tpch.lineitem.l_shipmode->Column#31    
+      └─Projection_14                284118.20     377566042.78     root                           tpch.orders.o_orderpriority, tpch.lineitem.l_shipmode                                                                                                                                                                                                                                                                                                              
+        └─MergeJoin_15               284118.20     377509332.79     root                           inner join, left key:tpch.lineitem.l_orderkey, right key:tpch.orders.o_orderkey                                                                                                                                                                                                                                                                                    
+          ├─TableReader_42(Build)    1500000.00    43648598.43      root                           data:TableFullScan_41                                                                                                                                                                                                                                                                                                                                              
+          │ └─TableFullScan_41       1500000.00    475519176.38     cop[tikv]    table:orders      keep order:true                                                                                                                                                                                                                                                                                                                                                    
+          └─TableReader_40(Probe)    281772.52     332971629.87     root                           data:Selection_39                                                                                                                                                                                                                                                                                                                                                  
+            └─Selection_39           281772.52     4911021906.97    cop[tikv]                      ge(tpch.lineitem.l_receiptdate, 1993-01-01), in(tpch.lineitem.l_shipmode, "FOB", "REG AIR"), lt(tpch.lineitem.l_commitdate, tpch.lineitem.l_receiptdate), lt(tpch.lineitem.l_receiptdate, 1994-01-01), lt(tpch.lineitem.l_shipdate, tpch.lineitem.l_commitdate)                                                                                                    
+              └─TableFullScan_38     8143998.00    2879094405.97    cop[tikv]    table:lineitem    keep order:true                                                                                                                                                                                                                                                                                                                                                    

@@ -1,0 +1,93 @@
+{
+ "columns": {
+  "dv_cmdline_args": {
+   "histogram": {
+    "ndv": 1
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "AS1ESVNUUklC/1VUSU9OUyAu/y90b29scy90/3BjZHMuaWR4/yAtU0NBTEUg/zEgLURJUiAu/y9kZ2VuX291/3RwdXQAAAAA+w==",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 62,
+   "last_update_version": 442619549726277646,
+   "correlation": 1
+  },
+  "dv_create_date": {
+   "histogram": {
+    "ndv": 1
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "BBmwfAAAAAAA",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 8,
+   "last_update_version": 442619549726277646,
+   "correlation": 1
+  },
+  "dv_create_time": {
+   "histogram": {
+    "ndv": 1
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "B4AAMYMRQcYA",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 8,
+   "last_update_version": 442619549726277646,
+   "correlation": 1
+  },
+  "dv_version": {
+   "histogram": {
+    "ndv": 1
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "ATIuMTAuMAAA/Q==",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 7,
+   "last_update_version": 442619549726277646,
+   "correlation": 1
+  }
+ },
+ "indices": {},
+ "partitions": null,
+ "database_name": "tpcds",
+ "table_name": "dbgen_version",
+ "ext_stats": null,
+ "count": 1,
+ "modify_count": 0,
+ "version": 442619549726277646,
+ "is_historical_stats": false
+}

@@ -1,0 +1,18 @@
+Alias: q8
+Query: 
+select * from tb where c=1 and a<10
+
+Original Cost: 1.91E+02
+Optimized Cost: 1.91E+02
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+TableReader_7          2.00    191.35     root                     data:Selection_6                         
+└─Selection_6          2.00    2616.86    cop[tikv]                eq(test1.tb.c, 1), lt(test1.tb.a, 10)    
+  └─TableFullScan_5    8.00    1818.46    cop[tikv]    table:tb    keep order:false                         
+
+===================== optimized plan =====================
+TableReader_7          2.00    191.35     root                     data:Selection_6                         
+└─Selection_6          2.00    2616.86    cop[tikv]                eq(test1.tb.c, 1), lt(test1.tb.a, 10)    
+  └─TableFullScan_5    8.00    1818.46    cop[tikv]    table:tb    keep order:false                         

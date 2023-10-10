@@ -1,0 +1,25 @@
+Total Queries in the workload: 5
+Total number of indexes: 2
+  CREATE INDEX idx_a ON test.t (a);
+  CREATE INDEX idx_a ON test1.t (a);
+Total original workload cost: 5.48E+02
+Total optimized workload cost: 4.00E+02
+Total cost reduction ratio: 27.01%
+Top 5 queries with the most cost reduction ratio:
+  Alias: q2, Cost Reduction Ratio: 5.49E+01->1.50E+01(0.27)
+  Alias: q10, Cost Reduction Ratio: 1.10E+02->3.77E+01(0.34)
+  Alias: q4, Cost Reduction Ratio: 5.49E+01->1.89E+01(0.34)
+  Alias: q6, Cost Reduction Ratio: 1.37E+02->1.37E+02(1.00)
+  Alias: q8, Cost Reduction Ratio: 1.91E+02->1.91E+02(1.00)
+Top 5 queries with the most cost reduction number:
+  Alias: q10, Cost Reduction Ratio: 1.10E+02->3.77E+01(0.34)
+  Alias: q2, Cost Reduction Ratio: 5.49E+01->1.50E+01(0.27)
+  Alias: q4, Cost Reduction Ratio: 5.49E+01->1.89E+01(0.34)
+  Alias: q6, Cost Reduction Ratio: 1.37E+02->1.37E+02(1.00)
+  Alias: q8, Cost Reduction Ratio: 1.91E+02->1.91E+02(1.00)
+Top 5 queries with the most cost:
+  Alias: q8, Cost Reduction Ratio: 1.91E+02->1.91E+02(1.00)
+  Alias: q6, Cost Reduction Ratio: 1.37E+02->1.37E+02(1.00)
+  Alias: q10, Cost Reduction Ratio: 1.10E+02->3.77E+01(0.34)
+  Alias: q4, Cost Reduction Ratio: 5.49E+01->1.89E+01(0.34)
+  Alias: q2, Cost Reduction Ratio: 5.49E+01->1.50E+01(0.27)

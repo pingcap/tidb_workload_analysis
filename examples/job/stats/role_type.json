@@ -1,0 +1,141 @@
+{
+ "is_historical_stats": false,
+ "database_name": "imdbload_no_fk",
+ "table_name": "role_type",
+ "columns": {
+  "id": {
+   "histogram": {
+    "ndv": 12
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "A4AAAAAAAAAB",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAC",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAD",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAE",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAF",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAG",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAH",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAI",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAJ",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAK",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAL",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAM",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 96,
+   "last_update_version": 441988931161161740,
+   "correlation": 1,
+   "stats_ver": 2
+  },
+  "role": {
+   "histogram": {
+    "ndv": 12
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "AWFjdG9yAAAA/A==",
+      "count": 1
+     },
+     {
+      "data": "AWFjdHJlc3MA/g==",
+      "count": 1
+     },
+     {
+      "data": "AWNpbmVtYXRv/2dyYXBoZXIA/g==",
+      "count": 1
+     },
+     {
+      "data": "AWNvbXBvc2Vy/wAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "AWNvc3R1bWUg/2Rlc2lnbmVy/wAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "AWRpcmVjdG9y/wAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "AWVkaXRvcgAA/Q==",
+      "count": 1
+     },
+     {
+      "data": "AWd1ZXN0AAAA/A==",
+      "count": 1
+     },
+     {
+      "data": "AW1pc2NlbGxh/25lb3VzIGNy/2V3AAAAAAAA+Q==",
+      "count": 1
+     },
+     {
+      "data": "AXByb2R1Y2Vy/wAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "AXByb2R1Y3Rp/29uIGRlc2ln/25lcgAAAAAA+g==",
+      "count": 1
+     },
+     {
+      "data": "AXdyaXRlcgAA/Q==",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 133,
+   "last_update_version": 441988931161161740,
+   "correlation": 0.4755244755244755,
+   "stats_ver": 2
+  }
+ },
+ "indices": {},
+ "ext_stats": null,
+ "count": 12,
+ "modify_count": 0,
+ "partitions": null,
+ "version": 441988931161161740
+}

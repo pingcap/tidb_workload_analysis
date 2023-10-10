@@ -1,0 +1,17 @@
+Alias: q10
+Query: 
+select a from t where a =1
+
+Original Cost: 1.10E+02
+Optimized Cost: 3.77E+01
+Cost Reduction Ratio: 0.34
+
+
+===================== original plan =====================
+TableReader_7          2.00    109.81     root                    data:Selection_6    
+└─Selection_6          2.00    1520.40    cop[tikv]               eq(test1.t.a, 1)    
+  └─TableFullScan_5    6.00    1221.00    cop[tikv]    table:t    keep order:false    
+
+===================== optimized plan =====================
+IndexReader_6         2.50    37.69     root                                    index:IndexRangeScan_5           
+└─IndexRangeScan_5    2.50    407.00    cop[tikv]    table:t, index:idx_a(a)    range:[1,1], keep order:false    

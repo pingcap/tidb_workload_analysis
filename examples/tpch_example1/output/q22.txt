@@ -1,0 +1,74 @@
+Alias: q22
+Query: 
+-- $ID$
+-- TPC-H/TPC-R Global Sales Opportunity Query (Q22)
+-- Functional Query Definition
+-- Approved February 1998
+
+
+select
+    cntrycode,
+    count(*) as numcust,
+    sum(c_acctbal) as totacctbal
+from
+    (
+        select
+            substring(c_phone from 1 for 2) as cntrycode,
+            c_acctbal
+        from
+            customer
+        where
+                substring(c_phone from 1 for 2) in
+                ('24', '33', '31', '10', '15', '28', '23')
+          and c_acctbal > (
+            select
+                avg(c_acctbal)
+            from
+                customer
+            where
+                    c_acctbal > 0.00
+              and substring(c_phone from 1 for 2) in
+                  ('24', '33', '31', '10', '15', '28', '23')
+        )
+          and not exists (
+                select
+                    *
+                from
+                    orders
+                where
+                        o_custkey = c_custkey
+            )
+    ) as custsale
+group by
+    cntrycode
+order by
+    cntrycode;
+
+Original Cost: 1.97E+08
+Optimized Cost: 4.30E+06
+Cost Reduction Ratio: 0.02
+
+
+===================== original plan =====================
+Sort_37                            1.00          197070568.96    root                           Column#31                                                                                                                                   
+└─Projection_39                    1.00          197070556.36    root                           Column#31, Column#32, Column#33                                                                                                             
+  └─HashAgg_40                     1.00          197070556.06    root                           group by:Column#37, funcs:count(1)->Column#32, funcs:sum(Column#35)->Column#33, funcs:firstrow(Column#36)->Column#31                        
+    └─Projection_48                0.00          197068996.76    root                           tpch.customer.c_acctbal->Column#35, substring(tpch.customer.c_phone, 1, 2)->Column#36, substring(tpch.customer.c_phone, 1, 2)->Column#37    
+      └─HashJoin_41                0.00          197068976.70    root                           anti semi join, equal:[eq(tpch.customer.c_custkey, tpch.orders.o_custkey)]                                                                  
+        ├─TableReader_46(Build)    1500000.00    38267144.51     root                           data:TableFullScan_45                                                                                                                       
+        │ └─TableFullScan_45       1500000.00    478967167.61    cop[tikv]    table:orders      keep order:false                                                                                                                            
+        └─TableReader_44(Probe)    0.00          4300315.24      root                           data:Selection_43                                                                                                                           
+          └─Selection_43           0.00          64504395.92     cop[tikv]                      gt(tpch.customer.c_acctbal, NULL), in(substring(tpch.customer.c_phone, 1, 2), "24", "33", "31", "10", "15", "28", "23")                     
+            └─TableFullScan_42     150000.00     49534395.92     cop[tikv]    table:customer    keep order:false                                                                                                                            
+
+===================== optimized plan =====================
+Sort_37                            1.00         4303914.83     root                                                                                                             Column#31                                                                                                                                                                  
+└─Projection_39                    1.00         4303902.23     root                                                                                                             Column#31, Column#32, Column#33                                                                                                                                            
+  └─HashAgg_40                     1.00         4303901.93     root                                                                                                             group by:Column#45, funcs:count(1)->Column#32, funcs:sum(Column#43)->Column#33, funcs:firstrow(Column#44)->Column#31                                                       
+    └─Projection_65                0.00         4302342.63     root                                                                                                             tpch.customer.c_acctbal->Column#43, substring(tpch.customer.c_phone, 1, 2)->Column#44, substring(tpch.customer.c_phone, 1, 2)->Column#45                                   
+      └─IndexJoin_44               0.00         4302322.57     root                                                                                                             anti semi join, inner:IndexReader_43, outer key:tpch.customer.c_custkey, inner key:tpch.orders.o_custkey, equal cond:eq(tpch.customer.c_custkey, tpch.orders.o_custkey)    
+        ├─TableReader_59(Build)    0.00         4300315.24     root                                                                                                             data:Selection_58                                                                                                                                                          
+        │ └─Selection_58           0.00         64504395.92    cop[tikv]                                                                                                        gt(tpch.customer.c_acctbal, NULL), in(substring(tpch.customer.c_phone, 1, 2), "24", "33", "31", "10", "15", "28", "23")                                                    
+        │   └─TableFullScan_57     150000.00    49534395.92    cop[tikv]    table:customer                                                                                      keep order:false                                                                                                                                                           
+        └─IndexReader_43(Probe)    0.00         21.38          root                                                                                                             index:IndexRangeScan_42                                                                                                                                                    
+          └─IndexRangeScan_42      0.00         257.30         cop[tikv]    table:orders, index:idx_o_custkey_o_orderdate_o_totalprice(O_CUSTKEY, O_ORDERDATE, O_TOTALPRICE)    range: decided by [eq(tpch.orders.o_custkey, tpch.customer.c_custkey)], keep order:false                                                                                   

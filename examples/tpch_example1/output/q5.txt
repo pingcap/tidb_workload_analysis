@@ -1,0 +1,91 @@
+Alias: q5
+Query: 
+-- $ID$
+-- TPC-H/TPC-R Local Supplier Volume Query (Q5)
+-- Functional Query Definition
+-- Approved February 1998
+
+
+select
+    n_name,
+    sum(l_extendedprice * (1 - l_discount)) as revenue
+from
+    customer,
+    orders,
+    lineitem,
+    supplier,
+    nation,
+    region
+where
+        c_custkey = o_custkey
+  and l_orderkey = o_orderkey
+  and l_suppkey = s_suppkey
+  and c_nationkey = s_nationkey
+  and s_nationkey = n_nationkey
+  and n_regionkey = r_regionkey
+  and r_name = 'AMERICA'
+  and o_orderdate >= date '1993-01-01'
+  and o_orderdate < date '1993-01-01' + interval '1' year
+group by
+    n_name
+order by
+    revenue desc;
+
+Original Cost: 7.79E+08
+Optimized Cost: 2.51E+08
+Cost Reduction Ratio: 0.32
+
+
+===================== original plan =====================
+Sort_24                                      5.00          778988301.99     root                           Column#48:desc                                                                                                                                     
+└─Projection_26                              5.00          778987657.67     root                           tpch.nation.n_name, Column#48                                                                                                                      
+  └─HashAgg_27                               5.00          778987656.67     root                           group by:Column#51, funcs:sum(Column#49)->Column#48, funcs:firstrow(Column#50)->tpch.nation.n_name                                                 
+    └─Projection_85                          251483.40     771481731.84     root                           mul(tpch.lineitem.l_extendedprice, minus(1, tpch.lineitem.l_discount))->Column#49, tpch.nation.n_name->Column#50, tpch.nation.n_name->Column#51    
+      └─Projection_28                        251483.40     768921731.39     root                           tpch.lineitem.l_extendedprice, tpch.lineitem.l_discount, tpch.nation.n_name                                                                        
+        └─HashJoin_37                        251483.40     768846437.26     root                           inner join, equal:[eq(tpch.orders.o_custkey, tpch.customer.c_custkey) eq(tpch.supplier.s_nationkey, tpch.customer.c_nationkey)]                    
+          ├─TableReader_83(Build)            150000.00     4575818.19       root                           data:TableFullScan_82                                                                                                                              
+          │ └─TableFullScan_82               150000.00     49629272.82      cop[tikv]    table:customer    keep order:false                                                                                                                                   
+          └─HashJoin_51(Probe)               250759.13     733346393.70     root                           inner join, equal:[eq(tpch.lineitem.l_orderkey, tpch.orders.o_orderkey)]                                                                           
+            ├─TableReader_81(Build)          229023.44     44813329.60      root                           data:Selection_80                                                                                                                                  
+            │ └─Selection_80                 229023.44     628667167.61     cop[tikv]                      ge(tpch.orders.o_orderdate, 1993-01-01), lt(tpch.orders.o_orderdate, 1994-01-01)                                                                   
+            │   └─TableFullScan_79           1500000.00    478967167.61     cop[tikv]    table:orders      keep order:false                                                                                                                                   
+            └─HashJoin_54(Probe)             1628799.60    630965562.27     root                           inner join, equal:[eq(tpch.supplier.s_suppkey, tpch.lineitem.l_suppkey)]                                                                           
+              ├─HashJoin_56(Build)           2000.00       505874.10        root                           inner join, equal:[eq(tpch.nation.n_nationkey, tpch.supplier.s_nationkey)]                                                                         
+              │ ├─HashJoin_69(Build)         5.00          3005.46          root                           inner join, equal:[eq(tpch.region.r_regionkey, tpch.nation.n_regionkey)]                                                                           
+              │ │ ├─TableReader_74(Build)    1.00          119.34           root                           data:Selection_73                                                                                                                                  
+              │ │ │ └─Selection_73           1.00          1675.92          cop[tikv]                      eq(tpch.region.r_name, "AMERICA")                                                                                                                  
+              │ │ │   └─TableFullScan_72     5.00          1426.42          cop[tikv]    table:region      keep order:false                                                                                                                                   
+              │ │ └─TableReader_71(Probe)    25.00         784.55           root                           data:TableFullScan_70                                                                                                                              
+              │ │   └─TableFullScan_70       25.00         7306.27          cop[tikv]    table:nation      keep order:false                                                                                                                                   
+              │ └─TableReader_76(Probe)      10000.00      301239.64        root                           data:TableFullScan_75                                                                                                                              
+              │   └─TableFullScan_75         10000.00      3251394.67       cop[tikv]    table:supplier    keep order:false                                                                                                                                   
+              └─TableReader_78(Probe)        8143998.00    467687991.09     root                           data:TableFullScan_77                                                                                                                              
+                └─TableFullScan_77           8143998.00    2887290160.10    cop[tikv]    table:lineitem    keep order:false                                                                                                                                   
+
+===================== optimized plan =====================
+Sort_24                                         5.00          251134006.42    root                                                                                                             Column#48:desc                                                                                                                                                            
+└─Projection_26                                 5.00          251133362.10    root                                                                                                             tpch.nation.n_name, Column#48                                                                                                                                             
+  └─HashAgg_27                                  5.00          251133361.11    root                                                                                                             group by:Column#54, funcs:sum(Column#52)->Column#48, funcs:firstrow(Column#53)->tpch.nation.n_name                                                                        
+    └─Projection_103                            251483.40     243627436.27    root                                                                                                             mul(tpch.lineitem.l_extendedprice, minus(1, tpch.lineitem.l_discount))->Column#52, tpch.nation.n_name->Column#53, tpch.nation.n_name->Column#54                           
+      └─Projection_28                           251483.40     241067435.83    root                                                                                                             tpch.lineitem.l_extendedprice, tpch.lineitem.l_discount, tpch.nation.n_name                                                                                               
+        └─HashJoin_37                           251483.40     240992141.70    root                                                                                                             inner join, equal:[eq(tpch.orders.o_custkey, tpch.customer.c_custkey) eq(tpch.supplier.s_nationkey, tpch.customer.c_nationkey)]                                           
+          ├─TableReader_101(Build)              150000.00     4575818.19      root                                                                                                             data:TableFullScan_100                                                                                                                                                    
+          │ └─TableFullScan_100                 150000.00     49629272.82     cop[tikv]    table:customer                                                                                      keep order:false                                                                                                                                                          
+          └─HashJoin_51(Probe)                  250759.13     205492098.14    root                                                                                                             inner join, equal:[eq(tpch.lineitem.l_orderkey, tpch.orders.o_orderkey)]                                                                                                  
+            ├─IndexReader_99(Build)             229023.44     39682982.47     root                                                                                                             index:Selection_98                                                                                                                                                        
+            │ └─Selection_98                    229023.44     551711960.67    cop[tikv]                                                                                                        ge(tpch.orders.o_orderdate, 1993-01-01), lt(tpch.orders.o_orderdate, 1994-01-01)                                                                                          
+            │   └─IndexFullScan_97              1500000.00    402011960.67    cop[tikv]    table:orders, index:idx_o_custkey_o_orderdate_o_totalprice(O_CUSTKEY, O_ORDERDATE, O_TOTALPRICE)    keep order:false                                                                                                                                                          
+            └─IndexHashJoin_61(Probe)           1628799.60    108241613.84    root                                                                                                             inner join, inner:Projection_58, outer key:tpch.supplier.s_suppkey, inner key:tpch.lineitem.l_suppkey, equal cond:eq(tpch.supplier.s_suppkey, tpch.lineitem.l_suppkey)    
+              ├─HashJoin_71(Build)              2000.00       505874.10       root                                                                                                             inner join, equal:[eq(tpch.nation.n_nationkey, tpch.supplier.s_nationkey)]                                                                                                
+              │ ├─HashJoin_84(Build)            5.00          3005.46         root                                                                                                             inner join, equal:[eq(tpch.region.r_regionkey, tpch.nation.n_regionkey)]                                                                                                  
+              │ │ ├─TableReader_89(Build)       1.00          119.34          root                                                                                                             data:Selection_88                                                                                                                                                         
+              │ │ │ └─Selection_88              1.00          1675.92         cop[tikv]                                                                                                        eq(tpch.region.r_name, "AMERICA")                                                                                                                                         
+              │ │ │   └─TableFullScan_87        5.00          1426.42         cop[tikv]    table:region                                                                                        keep order:false                                                                                                                                                          
+              │ │ └─TableReader_86(Probe)       25.00         784.55          root                                                                                                             data:TableFullScan_85                                                                                                                                                     
+              │ │   └─TableFullScan_85          25.00         7306.27         cop[tikv]    table:nation                                                                                        keep order:false                                                                                                                                                          
+              │ └─TableReader_91(Probe)         10000.00      301239.64       root                                                                                                             data:TableFullScan_90                                                                                                                                                     
+              │   └─TableFullScan_90            10000.00      3251394.67      cop[tikv]    table:supplier                                                                                      keep order:false                                                                                                                                                          
+              └─Projection_58(Probe)            1628799.60    1600695.04      root                                                                                                             tpch.lineitem.l_orderkey, tpch.lineitem.l_suppkey, tpch.lineitem.l_extendedprice, tpch.lineitem.l_discount                                                                
+                └─IndexLookUp_57                1628799.60    1600369.93      root                                                                                                                                                                                                                                                                                       
+                  ├─IndexRangeScan_55(Build)    1628799.60    198876.43       cop[tikv]    table:lineitem, index:idx_l_suppkey_l_shipdate(L_SUPPKEY, L_SHIPDATE)                               range: decided by [eq(tpch.lineitem.l_suppkey, tpch.supplier.s_suppkey)], keep order:false                                                                                
+                  └─TableRowIDScan_56(Probe)    1628799.60    288729.02       cop[tikv]    table:lineitem                                                                                      keep order:false                                                                                                                                                          

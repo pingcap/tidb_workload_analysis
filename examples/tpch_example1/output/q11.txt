@@ -1,0 +1,73 @@
+Alias: q11
+Query: 
+-- $ID$
+-- TPC-H/TPC-R Important Stock Identification Query (Q11)
+-- Functional Query Definition
+-- Approved February 1998
+
+
+select
+    ps_partkey,
+    sum(ps_supplycost * ps_availqty) as value
+from
+    partsupp,
+    supplier,
+    nation
+where
+    ps_suppkey = s_suppkey
+  and s_nationkey = n_nationkey
+  and n_name = 'JAPAN'
+group by
+    ps_partkey having
+    sum(ps_supplycost * ps_availqty) > (
+    select
+    sum(ps_supplycost * ps_availqty) * 0.0001000000
+    from
+    partsupp,
+    supplier,
+    nation
+    where
+    ps_suppkey = s_suppkey
+                  and s_nationkey = n_nationkey
+                  and n_name = 'JAPAN'
+    )
+order by
+    value desc;
+
+Original Cost: 7.62E+07
+Optimized Cost: 2.54E+07
+Cost Reduction Ratio: 0.33
+
+
+===================== original plan =====================
+Projection_63                          25600.00     76210937.11     root                           tpch.partsupp.ps_partkey, Column#33->Column#55                                                                                                                                  
+└─Sort_64                              25600.00     76205827.35     root                           Column#33:desc                                                                                                                                                                  
+  └─Selection_66                       25600.00     57253419.69     root                           gt(Column#33, NULL)                                                                                                                                                             
+    └─HashAgg_67                       32000.00     55656619.69     root                           group by:Column#58, funcs:sum(Column#56)->Column#33, funcs:firstrow(Column#57)->tpch.partsupp.ps_partkey                                                                        
+      └─Projection_94                  32000.00     53990495.49     root                           mul(tpch.partsupp.ps_supplycost, cast(tpch.partsupp.ps_availqty, decimal(20,0) BINARY))->Column#56, tpch.partsupp.ps_partkey->Column#57, tpch.partsupp.ps_partkey->Column#58    
+        └─HashJoin_71                  32000.00     53664748.29     root                           inner join, equal:[eq(tpch.supplier.s_suppkey, tpch.partsupp.ps_suppkey)]                                                                                                       
+          ├─HashJoin_84(Build)         400.00       503020.18       root                           inner join, equal:[eq(tpch.nation.n_nationkey, tpch.supplier.s_nationkey)]                                                                                                      
+          │ ├─TableReader_89(Build)    1.00         577.93          root                           data:Selection_88                                                                                                                                                               
+          │ │ └─Selection_88           1.00         8553.77         cop[tikv]                      eq(tpch.nation.n_name, "JAPAN")                                                                                                                                                 
+          │ │   └─TableFullScan_87     25.00        7306.27         cop[tikv]    table:nation      keep order:false                                                                                                                                                                
+          │ └─TableReader_86(Probe)    10000.00     301239.64       root                           data:TableFullScan_85                                                                                                                                                           
+          │   └─TableFullScan_85       10000.00     3251394.67      cop[tikv]    table:supplier    keep order:false                                                                                                                                                                
+          └─TableReader_91(Probe)      800000.00    37151671.11     root                           data:TableFullScan_90                                                                                                                                                           
+            └─TableFullScan_90         800000.00    253147066.66    cop[tikv]    table:partsupp    keep order:false                                                                                                                                                                
+
+===================== optimized plan =====================
+Projection_107                             25600.00    25358425.91    root                                                                                          tpch.partsupp.ps_partkey, Column#33->Column#55                                                                                                                                  
+└─Sort_108                                 25600.00    25353316.15    root                                                                                          Column#33:desc                                                                                                                                                                  
+  └─Selection_110                          25600.00    6400908.49     root                                                                                          gt(Column#33, NULL)                                                                                                                                                             
+    └─HashAgg_111                          32000.00    4804108.49     root                                                                                          group by:Column#58, funcs:sum(Column#56)->Column#33, funcs:firstrow(Column#57)->tpch.partsupp.ps_partkey                                                                        
+      └─Projection_166                     32000.00    3137984.29     root                                                                                          mul(tpch.partsupp.ps_supplycost, cast(tpch.partsupp.ps_availqty, decimal(20,0) BINARY))->Column#56, tpch.partsupp.ps_partkey->Column#57, tpch.partsupp.ps_partkey->Column#58    
+        └─IndexHashJoin_120                32000.00    2812237.09     root                                                                                          inner join, inner:IndexLookUp_117, outer key:tpch.supplier.s_suppkey, inner key:tpch.partsupp.ps_suppkey, equal cond:eq(tpch.supplier.s_suppkey, tpch.partsupp.ps_suppkey)      
+          ├─HashJoin_155(Build)            400.00      503020.18      root                                                                                          inner join, equal:[eq(tpch.nation.n_nationkey, tpch.supplier.s_nationkey)]                                                                                                      
+          │ ├─TableReader_160(Build)       1.00        577.93         root                                                                                          data:Selection_159                                                                                                                                                              
+          │ │ └─Selection_159              1.00        8553.77        cop[tikv]                                                                                     eq(tpch.nation.n_name, "JAPAN")                                                                                                                                                 
+          │ │   └─TableFullScan_158        25.00       7306.27        cop[tikv]    table:nation                                                                     keep order:false                                                                                                                                                                
+          │ └─TableReader_157(Probe)       10000.00    301239.64      root                                                                                          data:TableFullScan_156                                                                                                                                                          
+          │   └─TableFullScan_156          10000.00    3251394.67     cop[tikv]    table:supplier                                                                   keep order:false                                                                                                                                                                
+          └─IndexLookUp_117(Probe)         32000.00    157799.99      root                                                                                                                                                                                                                                                                          
+            ├─IndexRangeScan_115(Build)    32000.00    21440.64       cop[tikv]    table:partsupp, index:idx_ps_suppkey_ps_supplycost(PS_SUPPKEY, PS_SUPPLYCOST)    range: decided by [eq(tpch.partsupp.ps_suppkey, tpch.supplier.s_suppkey)], keep order:false                                                                                     
+            └─TableRowIDScan_116(Probe)    32000.00    25314.71       cop[tikv]    table:partsupp                                                                   keep order:false                                                                                                                                                                

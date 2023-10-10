@@ -1,0 +1,301 @@
+{
+ "columns": {
+  "ib_income_band_sk": {
+   "histogram": {
+    "ndv": 20
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "A4AAAAAAAAAB",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAC",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAD",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAE",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAF",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAG",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAH",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAI",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAJ",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAK",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAL",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAM",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAN",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAO",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAP",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAQ",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAR",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAS",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAT",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAU",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 160,
+   "last_update_version": 442619549804920846,
+   "correlation": 1
+  },
+  "ib_lower_bound": {
+   "histogram": {
+    "ndv": 20
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "A4AAAAAAAAAA",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAACcR",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAE4h",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAHUx",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAJxB",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAMNR",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAOph",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAARFx",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAATiB",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAV+R",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAYah",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAa2x",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAdTB",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAfvR",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAiLh",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAknx",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAnEB",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAApgR",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAr8h",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAuYx",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 160,
+   "last_update_version": 442619549804920846,
+   "correlation": 1
+  },
+  "ib_upper_bound": {
+   "histogram": {
+    "ndv": 20
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "A4AAAAAAACcQ",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAE4g",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAHUw",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAJxA",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAMNQ",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAOpg",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAARFw",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAATiA",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAV+Q",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAYag",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAa2w",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAdTA",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAfvQ",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAiLg",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAknw",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAnEA",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAApgQ",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAr8g",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAuYw",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAw1A",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 160,
+   "last_update_version": 442619549804920846,
+   "correlation": 1
+  }
+ },
+ "indices": {},
+ "partitions": null,
+ "database_name": "tpcds",
+ "table_name": "income_band",
+ "ext_stats": null,
+ "count": 20,
+ "modify_count": 0,
+ "version": 442619549804920846,
+ "is_historical_stats": false
+}

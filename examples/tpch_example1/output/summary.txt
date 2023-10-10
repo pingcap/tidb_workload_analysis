@@ -1,0 +1,43 @@
+Total Queries in the workload: 21
+Total number of indexes: 5
+  CREATE INDEX idx_l_partkey_l_quantity_l_shipmode ON tpch.lineitem (l_partkey, l_quantity, l_shipmode);
+  CREATE INDEX idx_l_partkey_l_shipdate_l_shipmode ON tpch.lineitem (l_partkey, l_shipdate, l_shipmode);
+  CREATE INDEX idx_l_suppkey_l_shipdate ON tpch.lineitem (l_suppkey, l_shipdate);
+  CREATE INDEX idx_o_custkey_o_orderdate_o_totalprice ON tpch.orders (o_custkey, o_orderdate, o_totalprice);
+  CREATE INDEX idx_ps_suppkey_ps_supplycost ON tpch.partsupp (ps_suppkey, ps_supplycost);
+Total original workload cost: 1.37E+10
+Total optimized workload cost: 1.02E+10
+Total cost reduction ratio: 25.22%
+Top 10 queries with the most cost reduction ratio:
+  Alias: q22, Cost Reduction Ratio: 1.97E+08->4.30E+06(0.02)
+  Alias: q19, Cost Reduction Ratio: 2.89E+08->1.20E+07(0.04)
+  Alias: q20, Cost Reduction Ratio: 3.40E+08->4.39E+07(0.13)
+  Alias: q17, Cost Reduction Ratio: 8.36E+08->2.00E+08(0.24)
+  Alias: q2, Cost Reduction Ratio: 1.35E+08->3.76E+07(0.28)
+  Alias: q5, Cost Reduction Ratio: 7.79E+08->2.51E+08(0.32)
+  Alias: q11, Cost Reduction Ratio: 7.62E+07->2.54E+07(0.33)
+  Alias: q7, Cost Reduction Ratio: 5.99E+08->2.46E+08(0.41)
+  Alias: q14, Cost Reduction Ratio: 2.76E+08->1.17E+08(0.43)
+  Alias: q21, Cost Reduction Ratio: 8.62E+08->4.30E+08(0.50)
+Top 10 queries with the most cost reduction number:
+  Alias: q17, Cost Reduction Ratio: 8.36E+08->2.00E+08(0.24)
+  Alias: q5, Cost Reduction Ratio: 7.79E+08->2.51E+08(0.32)
+  Alias: q21, Cost Reduction Ratio: 8.62E+08->4.30E+08(0.50)
+  Alias: q7, Cost Reduction Ratio: 5.99E+08->2.46E+08(0.41)
+  Alias: q20, Cost Reduction Ratio: 3.40E+08->4.39E+07(0.13)
+  Alias: q19, Cost Reduction Ratio: 2.89E+08->1.20E+07(0.04)
+  Alias: q9, Cost Reduction Ratio: 2.13E+09->1.90E+09(0.89)
+  Alias: q22, Cost Reduction Ratio: 1.97E+08->4.30E+06(0.02)
+  Alias: q14, Cost Reduction Ratio: 2.76E+08->1.17E+08(0.43)
+  Alias: q18, Cost Reduction Ratio: 3.41E+09->3.30E+09(0.97)
+Top 10 queries with the most cost:
+  Alias: q18, Cost Reduction Ratio: 3.41E+09->3.30E+09(0.97)
+  Alias: q9, Cost Reduction Ratio: 2.13E+09->1.90E+09(0.89)
+  Alias: q3, Cost Reduction Ratio: 1.77E+09->1.75E+09(0.99)
+  Alias: q21, Cost Reduction Ratio: 8.62E+08->4.30E+08(0.50)
+  Alias: q17, Cost Reduction Ratio: 8.36E+08->2.00E+08(0.24)
+  Alias: q5, Cost Reduction Ratio: 7.79E+08->2.51E+08(0.32)
+  Alias: q7, Cost Reduction Ratio: 5.99E+08->2.46E+08(0.41)
+  Alias: q12, Cost Reduction Ratio: 3.92E+08->3.92E+08(1.00)
+  Alias: q8, Cost Reduction Ratio: 3.57E+08->3.13E+08(0.88)
+  Alias: q6, Cost Reduction Ratio: 3.28E+08->3.28E+08(1.00)

@@ -1,0 +1,62 @@
+Alias: q17
+Query: 
+-- $ID$
+-- TPC-H/TPC-R Small-Quantity-Order Revenue Query (Q17)
+-- Functional Query Definition
+-- Approved February 1998
+
+
+select
+        sum(l_extendedprice) / 7.0 as avg_yearly
+from
+    lineitem,
+    part
+where
+        p_partkey = l_partkey
+  and p_brand = 'Brand#12'
+  and p_container = 'SM BAG'
+  and l_quantity < (
+    select
+            0.2 * avg(l_quantity)
+    from
+        lineitem
+    where
+            l_partkey = p_partkey
+);
+
+Original Cost: 8.36E+08
+Optimized Cost: 2.00E+08
+Cost Reduction Ratio: 0.24
+
+
+===================== original plan =====================
+Projection_17                    1.00          836221598.03     root                           div(Column#44, 7.0)->Column#45                                                                                                                    
+└─HashAgg_18                     1.00          836221588.05     root                           funcs:sum(tpch.lineitem.l_extendedprice)->Column#44                                                                                               
+  └─HashJoin_22                  8286.85       836053846.97     root                           inner join, equal:[eq(tpch.part.p_partkey, tpch.lineitem.l_partkey)], other cond:lt(tpch.lineitem.l_quantity, mul(0.2, Column#42))                
+    ├─HashJoin_35(Build)         8286.85       601537324.90     root                           inner join, equal:[eq(tpch.part.p_partkey, tpch.lineitem.l_partkey)]                                                                              
+    │ ├─TableReader_40(Build)    200.41        5672147.30       root                           data:Selection_39                                                                                                                                 
+    │ │ └─Selection_39           200.41        85047844.78      cop[tikv]                      eq(tpch.part.p_brand, "Brand#12"), eq(tpch.part.p_container, "SM BAG")                                                                            
+    │ │   └─TableFullScan_38     200000.00     65087844.78      cop[tikv]    table:part        keep order:false                                                                                                                                  
+    │ └─TableReader_37(Probe)    8143998.00    433287743.54     root                           data:TableFullScan_36                                                                                                                             
+    │   └─TableFullScan_36       8143998.00    2887290160.10    cop[tikv]    table:lineitem    keep order:false                                                                                                                                  
+    └─HashAgg_45(Probe)          196960.00     229610827.60     root                           group by:tpch.lineitem.l_partkey, funcs:avg(Column#48, Column#49)->Column#42, funcs:firstrow(tpch.lineitem.l_partkey)->tpch.lineitem.l_partkey    
+      └─TableReader_46           196960.00     217417545.99     root                           data:HashAgg_41                                                                                                                                   
+        └─HashAgg_41             196960.00     3217585340.26    cop[tikv]                      group by:tpch.lineitem.l_partkey, funcs:count(tpch.lineitem.l_quantity)->Column#48, funcs:sum(tpch.lineitem.l_quantity)->Column#49                
+          └─TableFullScan_44     8143998.00    2887290160.10    cop[tikv]    table:lineitem    keep order:false                                                                                                                                  
+
+===================== optimized plan =====================
+Projection_17                           1.00          199506993.50     root                                                                                                         div(Column#44, 7.0)->Column#45                                                                                                                                    
+└─HashAgg_18                            1.00          199506983.52     root                                                                                                         funcs:sum(tpch.lineitem.l_extendedprice)->Column#44                                                                                                               
+  └─HashJoin_23                         8286.85       199339242.44     root                                                                                                         inner join, equal:[eq(tpch.part.p_partkey, tpch.lineitem.l_partkey)], other cond:lt(tpch.lineitem.l_quantity, mul(0.2, Column#42))                                
+    ├─IndexHashJoin_67(Build)           8286.85       6319755.43       root                                                                                                         inner join, inner:Projection_64, outer key:tpch.part.p_partkey, inner key:tpch.lineitem.l_partkey, equal cond:eq(tpch.part.p_partkey, tpch.lineitem.l_partkey)    
+    │ ├─TableReader_89(Build)           200.41        5672147.30       root                                                                                                         data:Selection_88                                                                                                                                                 
+    │ │ └─Selection_88                  200.41        85047844.78      cop[tikv]                                                                                                    eq(tpch.part.p_brand, "Brand#12"), eq(tpch.part.p_container, "SM BAG")                                                                                            
+    │ │   └─TableFullScan_87            200000.00     65087844.78      cop[tikv]    table:part                                                                                      keep order:false                                                                                                                                                  
+    │ └─Projection_64(Probe)            8286.85       81394.74         root                                                                                                         tpch.lineitem.l_partkey, tpch.lineitem.l_quantity, tpch.lineitem.l_extendedprice                                                                                  
+    │   └─IndexLookUp_63                8286.85       81382.36         root                                                                                                                                                                                                                                                                           
+    │     ├─IndexRangeScan_61(Build)    8286.85       10699.02         cop[tikv]    table:lineitem, index:idx_l_partkey_l_shipdate_l_shipmode(L_PARTKEY, L_SHIPDATE, L_SHIPMODE)    range: decided by [eq(tpch.lineitem.l_partkey, tpch.part.p_partkey)], keep order:false                                                                            
+    │     └─TableRowIDScan_62(Probe)    8286.85       14659.27         cop[tikv]    table:lineitem                                                                                  keep order:false                                                                                                                                                  
+    └─HashAgg_101(Probe)                196960.00     188113792.54     root                                                                                                         group by:tpch.lineitem.l_partkey, funcs:avg(Column#68, Column#69)->Column#42, funcs:firstrow(tpch.lineitem.l_partkey)->tpch.lineitem.l_partkey                    
+      └─IndexReader_102                 196960.00     175920510.93     root                                                                                                         index:HashAgg_92                                                                                                                                                  
+        └─HashAgg_92                    196960.00     2595129814.37    cop[tikv]                                                                                                    group by:tpch.lineitem.l_partkey, funcs:count(tpch.lineitem.l_quantity)->Column#68, funcs:sum(tpch.lineitem.l_quantity)->Column#69                                
+          └─IndexFullScan_100           8143998.00    2264834634.21    cop[tikv]    table:lineitem, index:idx_l_partkey_l_quantity_l_shipmode(L_PARTKEY, L_QUANTITY, L_SHIPMODE)    keep order:false                                                                                                                                                  

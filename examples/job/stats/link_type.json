@@ -1,0 +1,189 @@
+{
+ "is_historical_stats": false,
+ "database_name": "imdbload_no_fk",
+ "table_name": "link_type",
+ "columns": {
+  "id": {
+   "histogram": {
+    "ndv": 18
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "A4AAAAAAAAAB",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAC",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAD",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAE",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAF",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAG",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAH",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAI",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAJ",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAK",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAL",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAM",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAN",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAO",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAP",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAQ",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAR",
+      "count": 1
+     },
+     {
+      "data": "A4AAAAAAAAAS",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 144,
+   "last_update_version": 441988928304054286,
+   "correlation": 1,
+   "stats_ver": 2
+  },
+  "link": {
+   "histogram": {
+    "ndv": 18
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "AWFsdGVybmF0/2UgbGFuZ3Vh/2dlIHZlcnNp/29uIG9mAAAA/A==",
+      "count": 1
+     },
+     {
+      "data": "AWVkaXRlZCBm/3JvbQAAAAAA+g==",
+      "count": 1
+     },
+     {
+      "data": "AWVkaXRlZCBp/250bwAAAAAA+g==",
+      "count": 1
+     },
+     {
+      "data": "AWZlYXR1cmVk/yBpbgAAAAAA+g==",
+      "count": 1
+     },
+     {
+      "data": "AWZlYXR1cmVz/wAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "AWZvbGxvd2Vk/yBieQAAAAAA+g==",
+      "count": 1
+     },
+     {
+      "data": "AWZvbGxvd3MA/g==",
+      "count": 1
+     },
+     {
+      "data": "AXJlZmVyZW5j/2VkIGluAAAA/A==",
+      "count": 1
+     },
+     {
+      "data": "AXJlZmVyZW5j/2VzAAAAAAAA+Q==",
+      "count": 1
+     },
+     {
+      "data": "AXJlbWFkZSBh/3MAAAAAAAAA+A==",
+      "count": 1
+     },
+     {
+      "data": "AXJlbWFrZSBv/2YAAAAAAAAA+A==",
+      "count": 1
+     },
+     {
+      "data": "AXNpbWlsYXIg/3RvAAAAAAAA+Q==",
+      "count": 1
+     },
+     {
+      "data": "AXNwaW4gb2Zm/wAAAAAAAAAA9w==",
+      "count": 1
+     },
+     {
+      "data": "AXNwaW4gb2Zm/yBmcm9tAAAA/A==",
+      "count": 1
+     },
+     {
+      "data": "AXNwb29mZWQg/2luAAAAAAAA+Q==",
+      "count": 1
+     },
+     {
+      "data": "AXNwb29mcwAA/Q==",
+      "count": 1
+     },
+     {
+      "data": "AXVua25vd24g/2xpbmsAAAAA+w==",
+      "count": 1
+     },
+     {
+      "data": "AXZlcnNpb24g/29mAAAAAAAA+Q==",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 216,
+   "last_update_version": 441988928304054286,
+   "correlation": -0.021671826625386997,
+   "stats_ver": 2
+  }
+ },
+ "indices": {},
+ "ext_stats": null,
+ "count": 18,
+ "modify_count": 0,
+ "partitions": null,
+ "version": 441988928304054286
+}

@@ -1,0 +1,229 @@
+{
+ "is_historical_stats": false,
+ "database_name": "ethereum",
+ "table_name": "traces",
+ "columns": {
+  "block_number": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "call_type": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "error": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "from_address": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "gas": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "gas_used": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "input": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "output": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "reward_type": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "status": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "subtraces": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "to_address": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "trace_address": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "trace_id": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "trace_type": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "transaction_hash": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "transaction_index": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  },
+  "value": {
+   "histogram": {
+    "ndv": 0
+   },
+   "cm_sketch": null,
+   "fm_sketch": null,
+   "null_count": 0,
+   "tot_col_size": 0,
+   "last_update_version": 442822939932622850,
+   "correlation": 0,
+   "stats_ver": 2
+  }
+ },
+ "indices": {},
+ "ext_stats": null,
+ "count": 0,
+ "modify_count": 0,
+ "partitions": null,
+ "version": 442822939932622850
+}

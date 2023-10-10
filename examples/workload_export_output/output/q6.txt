@@ -1,0 +1,18 @@
+Alias: q6
+Query: 
+select * from ta where a=1 and b >1
+
+Original Cost: 1.37E+02
+Optimized Cost: 1.37E+02
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+TableReader_7          0.75    137.18     root                     data:Selection_6                      
+└─Selection_6          0.75    1962.65    cop[tikv]                eq(test.ta.a, 1), gt(test.ta.b, 1)    
+  └─TableFullScan_5    6.00    1363.85    cop[tikv]    table:ta    keep order:false                      
+
+===================== optimized plan =====================
+TableReader_7          0.75    137.18     root                     data:Selection_6                      
+└─Selection_6          0.75    1962.65    cop[tikv]                eq(test.ta.a, 1), gt(test.ta.b, 1)    
+  └─TableFullScan_5    6.00    1363.85    cop[tikv]    table:ta    keep order:false                      

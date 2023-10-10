@@ -1,0 +1,97 @@
+Alias: q20
+Query: 
+-- $ID$
+-- TPC-H/TPC-R Potential Part Promotion Query (Q20)
+-- Function Query Definition
+-- Approved February 1998
+
+
+select
+    s_name,
+    s_address
+from
+    supplier,
+    nation
+where
+        s_suppkey in (
+        select
+            ps_suppkey
+        from
+            partsupp
+        where
+                ps_partkey in (
+                select
+                    p_partkey
+                from
+                    part
+                where
+                        p_name like 'ivory%'
+            )
+          and ps_availqty > (
+            select
+                    0.5 * sum(l_quantity)
+            from
+                lineitem
+            where
+                    l_partkey = ps_partkey
+              and l_suppkey = ps_suppkey
+              and l_shipdate >= date '1996-01-01'
+              and l_shipdate < date '1996-01-01' + interval '1' year
+        )
+    )
+  and s_nationkey = n_nationkey
+  and n_name = 'KENYA'
+order by
+    s_name;
+
+Original Cost: 3.40E+08
+Optimized Cost: 4.39E+07
+Cost Reduction Ratio: 0.13
+
+
+===================== original plan =====================
+Sort_31                                400.00        340085082.79     root                           tpch.supplier.s_name                                                                                                                                                                                                                                     
+└─HashJoin_36                          400.00        339907511.74     root                           inner join, equal:[eq(tpch.supplier.s_suppkey, tpch.partsupp.ps_suppkey)]                                                                                                                                                                                
+  ├─HashJoin_49(Build)                 400.00        636328.60        root                           inner join, equal:[eq(tpch.nation.n_nationkey, tpch.supplier.s_nationkey)]                                                                                                                                                                               
+  │ ├─TableReader_54(Build)            1.00          577.93           root                           data:Selection_53                                                                                                                                                                                                                                        
+  │ │ └─Selection_53                   1.00          8553.77          cop[tikv]                      eq(tpch.nation.n_name, "KENYA")                                                                                                                                                                                                                          
+  │ │   └─TableFullScan_52             25.00         7306.27          cop[tikv]    table:nation      keep order:false                                                                                                                                                                                                                                         
+  │ └─TableReader_51(Probe)            10000.00      434548.06        root                           data:TableFullScan_50                                                                                                                                                                                                                                    
+  │   └─TableFullScan_50               10000.00      3190632.86       cop[tikv]    table:supplier    keep order:false                                                                                                                                                                                                                                         
+  └─HashAgg_55(Probe)                  5085.30       339122743.63     root                           group by:tpch.partsupp.ps_suppkey, funcs:firstrow(tpch.partsupp.ps_suppkey)->tpch.partsupp.ps_suppkey                                                                                                                                                    
+    └─Selection_56                     5085.30       338865355.53     root                           gt(cast(tpch.partsupp.ps_availqty, decimal(20,0) BINARY), mul(0.5, Column#42))                                                                                                                                                                           
+      └─HashAgg_57                     6356.62       338548160.16     root                           group by:tpch.partsupp.ps_partkey, tpch.partsupp.ps_suppkey, funcs:firstrow(tpch.partsupp.ps_suppkey)->tpch.partsupp.ps_suppkey, funcs:firstrow(tpch.partsupp.ps_availqty)->tpch.partsupp.ps_availqty, funcs:sum(tpch.lineitem.l_quantity)->Column#42    
+        └─HashJoin_61                  262836.65     322446062.17     root                           left outer join, equal:[eq(tpch.partsupp.ps_partkey, tpch.lineitem.l_partkey) eq(tpch.partsupp.ps_suppkey, tpch.lineitem.l_suppkey)]                                                                                                                     
+          ├─IndexJoin_67(Build)        6356.62       5809768.89       root                           inner join, inner:TableReader_64, outer key:tpch.part.p_partkey, inner key:tpch.partsupp.ps_partkey, equal cond:eq(tpch.part.p_partkey, tpch.partsupp.ps_partkey)                                                                                        
+          │ ├─TableReader_92(Build)    1565.00       5008825.96       root                           data:Selection_91                                                                                                                                                                                                                                        
+          │ │ └─Selection_91           1565.00       74805972.37      cop[tikv]                      like(tpch.part.p_name, "ivory%", 92)                                                                                                                                                                                                                     
+          │ │   └─TableFullScan_90     200000.00     64825972.37      cop[tikv]    table:part        keep order:false                                                                                                                                                                                                                                         
+          │ └─TableReader_64(Probe)    1565.00       26.64            root                           data:TableRangeScan_63                                                                                                                                                                                                                                   
+          │   └─TableRangeScan_63      1565.00       304.59           cop[tikv]    table:partsupp    range: decided by [eq(tpch.partsupp.ps_partkey, tpch.part.p_partkey)], keep order:false                                                                                                                                                                  
+          └─TableReader_97(Probe)      1247774.30    278294335.87     root                           data:Selection_96                                                                                                                                                                                                                                        
+            └─Selection_96             1247774.30    3700061160.50    cop[tikv]                      ge(tpch.lineitem.l_shipdate, 1996-01-01), lt(tpch.lineitem.l_shipdate, 1997-01-01)                                                                                                                                                                       
+              └─TableFullScan_95       8143998.00    2887290160.10    cop[tikv]    table:lineitem    keep order:false                                                                                                                                                                                                                                         
+
+===================== optimized plan =====================
+Sort_31                                     400.00       43928127.20    root                                                                                                         tpch.supplier.s_name                                                                                                                                                                                                                                     
+└─HashJoin_36                               400.00       43750556.15    root                                                                                                         inner join, equal:[eq(tpch.supplier.s_suppkey, tpch.partsupp.ps_suppkey)]                                                                                                                                                                                
+  ├─HashJoin_49(Build)                      400.00       636328.60      root                                                                                                         inner join, equal:[eq(tpch.nation.n_nationkey, tpch.supplier.s_nationkey)]                                                                                                                                                                               
+  │ ├─TableReader_54(Build)                 1.00         577.93         root                                                                                                         data:Selection_53                                                                                                                                                                                                                                        
+  │ │ └─Selection_53                        1.00         8553.77        cop[tikv]                                                                                                    eq(tpch.nation.n_name, "KENYA")                                                                                                                                                                                                                          
+  │ │   └─TableFullScan_52                  25.00        7306.27        cop[tikv]    table:nation                                                                                    keep order:false                                                                                                                                                                                                                                         
+  │ └─TableReader_51(Probe)                 10000.00     434548.06      root                                                                                                         data:TableFullScan_50                                                                                                                                                                                                                                    
+  │   └─TableFullScan_50                    10000.00     3190632.86     cop[tikv]    table:supplier                                                                                  keep order:false                                                                                                                                                                                                                                         
+  └─HashAgg_55(Probe)                       5085.30      42965788.03    root                                                                                                         group by:tpch.partsupp.ps_suppkey, funcs:firstrow(tpch.partsupp.ps_suppkey)->tpch.partsupp.ps_suppkey                                                                                                                                                    
+    └─Selection_56                          5085.30      42708399.93    root                                                                                                         gt(cast(tpch.partsupp.ps_availqty, decimal(20,0) BINARY), mul(0.5, Column#42))                                                                                                                                                                           
+      └─HashAgg_57                          6356.62      42391204.56    root                                                                                                         group by:tpch.partsupp.ps_partkey, tpch.partsupp.ps_suppkey, funcs:firstrow(tpch.partsupp.ps_suppkey)->tpch.partsupp.ps_suppkey, funcs:firstrow(tpch.partsupp.ps_availqty)->tpch.partsupp.ps_availqty, funcs:sum(tpch.lineitem.l_quantity)->Column#42    
+        └─IndexHashJoin_67                  262836.65    26289106.58    root                                                                                                         left outer join, inner:Projection_64, outer key:tpch.partsupp.ps_partkey, inner key:tpch.lineitem.l_partkey, equal cond:eq(tpch.partsupp.ps_partkey, tpch.lineitem.l_partkey), eq(tpch.partsupp.ps_suppkey, tpch.lineitem.l_suppkey)                     
+          ├─IndexJoin_102(Build)            6356.62      5809768.89     root                                                                                                         inner join, inner:TableReader_99, outer key:tpch.part.p_partkey, inner key:tpch.partsupp.ps_partkey, equal cond:eq(tpch.part.p_partkey, tpch.partsupp.ps_partkey)                                                                                        
+          │ ├─TableReader_122(Build)        1565.00      5008825.96     root                                                                                                         data:Selection_121                                                                                                                                                                                                                                       
+          │ │ └─Selection_121               1565.00      74805972.37    cop[tikv]                                                                                                    like(tpch.part.p_name, "ivory%", 92)                                                                                                                                                                                                                     
+          │ │   └─TableFullScan_120         200000.00    64825972.37    cop[tikv]    table:part                                                                                      keep order:false                                                                                                                                                                                                                                         
+          │ └─TableReader_99(Probe)         1565.00      26.64          root                                                                                                         data:TableRangeScan_98                                                                                                                                                                                                                                   
+          │   └─TableRangeScan_98           1565.00      304.59         cop[tikv]    table:partsupp                                                                                  range: decided by [eq(tpch.partsupp.ps_partkey, tpch.part.p_partkey)], keep order:false                                                                                                                                                                  
+          └─Projection_64(Probe)            262836.65    81346.74       root                                                                                                         tpch.lineitem.l_partkey, tpch.lineitem.l_suppkey, tpch.lineitem.l_quantity, tpch.lineitem.l_shipdate                                                                                                                                                     
+            └─IndexLookUp_63                262836.65    81330.23       root                                                                                                                                                                                                                                                                                                                                                                  
+              ├─IndexRangeScan_61(Build)    262836.65    10699.02       cop[tikv]    table:lineitem, index:idx_l_partkey_l_shipdate_l_shipmode(L_PARTKEY, L_SHIPDATE, L_SHIPMODE)    range: decided by [eq(tpch.lineitem.l_partkey, tpch.partsupp.ps_partkey) ge(tpch.lineitem.l_shipdate, 1996-01-01) lt(tpch.lineitem.l_shipdate, 1997-01-01)], keep order:false                                                                            
+              └─TableRowIDScan_62(Probe)    262836.65    14659.27       cop[tikv]    table:lineitem                                                                                  keep order:false                                                                                                                                                                                                                                         

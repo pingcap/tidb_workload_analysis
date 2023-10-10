@@ -1,0 +1,57 @@
+Alias: q13
+Query: 
+-- $ID$
+-- TPC-H/TPC-R Customer Distribution Query (Q13)
+-- Functional Query Definition
+-- Approved February 1998
+
+
+select
+    c_count,
+    count(*) as custdist
+from
+    (
+        select
+            c_custkey,
+            count(o_orderkey) as c_count
+        from
+            customer left outer join orders on
+                        c_custkey = o_custkey
+                    and o_comment not like '%special%packages%'
+        group by
+            c_custkey
+    ) as c_orders
+group by
+    c_count
+order by
+    custdist desc,
+    c_count desc;
+
+Original Cost: 2.84E+08
+Optimized Cost: 2.84E+08
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+Sort_10                            149568.00     283698218.67    root                           Column#19:desc, Column#18:desc                                                         
+└─Projection_12                    149568.00     154919713.48    root                           Column#18, Column#19                                                                   
+  └─HashAgg_13                     149568.00     154889859.70    root                           group by:Column#18, funcs:count(1)->Column#19, funcs:firstrow(Column#18)->Column#18    
+    └─HashAgg_14                   149568.00     145821580.46    root                           group by:tpch.customer.c_custkey, funcs:count(tpch.orders.o_orderkey)->Column#18       
+      └─HashJoin_17                1203465.98    106634967.01    root                           left outer join, equal:[eq(tpch.customer.c_custkey, tpch.orders.o_custkey)]            
+        ├─TableReader_19(Build)    150000.00     3942218.19      root                           data:TableFullScan_18                                                                  
+        │ └─TableFullScan_18       150000.00     49629272.82     cop[tikv]    table:customer    keep order:false                                                                       
+        └─TableReader_22(Probe)    1200000.00    63289251.82     root                           data:Selection_21                                                                      
+          └─Selection_21           1200000.00    549553017.35    cop[tikv]                      not(like(tpch.orders.o_comment, "%special%packages%", 92))                             
+            └─TableFullScan_20     1500000.00    474703017.35    cop[tikv]    table:orders      keep order:false                                                                       
+
+===================== optimized plan =====================
+Sort_10                            149568.00     283698218.67    root                           Column#19:desc, Column#18:desc                                                         
+└─Projection_12                    149568.00     154919713.48    root                           Column#18, Column#19                                                                   
+  └─HashAgg_13                     149568.00     154889859.70    root                           group by:Column#18, funcs:count(1)->Column#19, funcs:firstrow(Column#18)->Column#18    
+    └─HashAgg_14                   149568.00     145821580.46    root                           group by:tpch.customer.c_custkey, funcs:count(tpch.orders.o_orderkey)->Column#18       
+      └─HashJoin_31                1203465.98    106634967.01    root                           left outer join, equal:[eq(tpch.customer.c_custkey, tpch.orders.o_custkey)]            
+        ├─TableReader_39(Build)    150000.00     3942218.19      root                           data:TableFullScan_38                                                                  
+        │ └─TableFullScan_38       150000.00     49629272.82     cop[tikv]    table:customer    keep order:false                                                                       
+        └─TableReader_42(Probe)    1200000.00    63289251.82     root                           data:Selection_41                                                                      
+          └─Selection_41           1200000.00    549553017.35    cop[tikv]                      not(like(tpch.orders.o_comment, "%special%packages%", 92))                             
+            └─TableFullScan_40     1500000.00    474703017.35    cop[tikv]    table:orders      keep order:false                                                                       
