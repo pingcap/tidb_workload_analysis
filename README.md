@@ -51,19 +51,17 @@ Generally speaking:
 
 ### Installation
 
+Install TiDB Index Advisor by running the following command:
+
+```shell
+curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/pingcap/index_advisor/main/install.sh | sh
+```
+
 If you are going to use the offline-mode, you need to install [TiUP](https://docs.pingcap.com/tidb/dev/tiup-overview)
 first. Please use the following command to install [TiUP](https://docs.pingcap.com/tidb/dev/tiup-overview):
 
 ```shell
 curl --proto '=https' --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh | sh
-```
-
-Currently, to use this tool, you have to build it from the source code (we'll prepare a binary version soon):
-
-```shell
-# install golang on your machine first
-> git clone https://github.com/qw4990/index_advisor.git
-> cd index_advisor; go build;
 ```
 
 ### Online Mode

@@ -61,9 +61,6 @@ else
 fi
 echo "Shell profile:  ${bold}$PROFILE${sgr0}"
 
-echo $PATH
-echo $bin_dir
-
 case :$PATH: in
     *:$bin_dir:*) : "PATH already contains $bin_dir" ;;
     *) printf '\nexport PATH=%s:$PATH\n' "$bin_dir" >> "$PROFILE"
