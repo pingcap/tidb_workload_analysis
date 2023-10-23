@@ -42,7 +42,7 @@ if ! install_binary; then
     exit 1
 fi
 
-chmod 755 "$bin_dir/index_advisor"
+chmod 755 "$bin_dir/index-advisor"
 
 bold=$(tput bold 2>/dev/null)
 sgr0=$(tput sgr0 2>/dev/null)
@@ -69,7 +69,7 @@ case :$PATH: in
         ;;
 esac
 
-echo "Installed path: ${bold}$bin_dir/index_advisor${sgr0}"
+echo "Installed path: ${bold}$bin_dir/index-advisor${sgr0}"
 echo "==============================================="
-echo "Have a try:     ${bold}index_advisor --help${sgr0}"
+echo "Have a try:     ${bold}index-advisor --help${sgr0}"
 echo "==============================================="
