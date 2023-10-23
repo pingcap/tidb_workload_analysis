@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/qw4990/index_advisor/optimizer"
-	"github.com/qw4990/index_advisor/utils"
+	"github.com/pingcap/index_advisor/optimizer"
+	"github.com/pingcap/index_advisor/utils"
 )
 
 func prepareTestWorkload(dsn, schemaName string, createTableStmts, rawSQLs []string) (utils.WorkloadInfo, optimizer.WhatIfOptimizer) {

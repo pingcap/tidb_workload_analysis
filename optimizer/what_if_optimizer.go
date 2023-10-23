@@ -6,7 +6,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/qw4990/index_advisor/utils"
+	"github.com/pingcap/index_advisor/utils"
 )
 
 // WhatIfOptimizerStats records the statistics of a what-if optimizer.

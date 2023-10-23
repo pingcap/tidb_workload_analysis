@@ -7,7 +7,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/qw4990/index_advisor/utils"
+	"github.com/pingcap/index_advisor/utils"
 )
 
 // TiDBWhatIfOptimizer is the what-if optimizer implementation fot TiDB.
