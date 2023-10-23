@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/qw4990/index_advisor/optimizer"
+	"github.com/pingcap/index_advisor/optimizer"
 	"github.com/spf13/cobra"
 )
 

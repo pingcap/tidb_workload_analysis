@@ -7,8 +7,8 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/qw4990/index_advisor/optimizer"
-	"github.com/qw4990/index_advisor/utils"
+	"github.com/pingcap/index_advisor/optimizer"
+	"github.com/pingcap/index_advisor/utils"
 )
 
 func evaluateIndexConfCostConcurrently(info utils.WorkloadInfo, optimizers []optimizer.WhatIfOptimizer,

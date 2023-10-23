@@ -3,11 +3,11 @@ package advisor
 import (
 	"strings"
 
+	"github.com/pingcap/index_advisor/utils"
 	"github.com/pingcap/parser/ast"
 	"github.com/pingcap/parser/mysql"
 	"github.com/pingcap/parser/opcode"
 	_ "github.com/pingcap/tidb/types/parser_driver"
-	"github.com/qw4990/index_advisor/utils"
 )
 
 // simpleIndexableColumnsVisitor finds all columns that appear in any range-filter, order-by, or group-by clause.

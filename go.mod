@@ -1,4 +1,4 @@
-module github.com/qw4990/index_advisor
+module github.com/pingcap/index_advisor
 
 go 1.20
 

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qw4990/index_advisor/optimizer"
-	"github.com/qw4990/index_advisor/utils"
+	"github.com/pingcap/index_advisor/optimizer"
+	"github.com/pingcap/index_advisor/utils"
 )
 
 func prepareTable(db optimizer.WhatIfOptimizer, schema, createStmt string, nRows int) {

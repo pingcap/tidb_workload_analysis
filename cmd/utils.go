@@ -11,8 +11,8 @@ import (
 	"strings"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/qw4990/index_advisor/optimizer"
-	"github.com/qw4990/index_advisor/utils"
+	"github.com/pingcap/index_advisor/optimizer"
+	"github.com/pingcap/index_advisor/utils"
 )
 
 // loadWorkloadIntoCluster loads the schema the TiDB cluster

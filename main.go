@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/qw4990/index_advisor/cmd"
+	"github.com/pingcap/index_advisor/cmd"
 	"github.com/spf13/cobra"
 )
 

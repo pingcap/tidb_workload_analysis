@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qw4990/index_advisor/utils"
+	"github.com/pingcap/index_advisor/utils"
 )
 
 func must(err error) {
