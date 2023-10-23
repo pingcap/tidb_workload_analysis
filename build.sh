@@ -25,8 +25,7 @@ if [ -z "$arch" ]; then
 fi
 
 GITHASH=$(git rev-parse HEAD)
-BIN_OUTPUT="index-advisor-$os-$arch"
 
-GO111MODULE=on go build -ldflags "-X github.com/pingcap/index_advisor/version.GitHash=$GITHASH" -o bin/$BIN_OUTPUT main.go
+GO111MODULE=on go build -ldflags "-X github.com/pingcap/index_advisor/version.GitHash=$GITHASH" -o bin/index-advisor main.go
 
-tar -czf bin/$BIN_OUTPUT.tar.gz bin/$BIN_OUTPUT
+tar -czf bin/index-advisor-$os-$arch.tar.gz bin/index-advisor
