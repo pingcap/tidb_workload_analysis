@@ -3,8 +3,8 @@
 repo='https://github.com/pingcap/index_advisor'
 
 case $(uname -s) in
-    Linux|linux) os=Linux ;;
-    Darwin|darwin) os=Darwin ;;
+    Linux|linux) os=linux ;;
+    Darwin|darwin) os=linux ;;
     *) os= ;;
 esac
 
