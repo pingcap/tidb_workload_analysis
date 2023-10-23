@@ -28,4 +28,6 @@ GITHASH=$(git rev-parse HEAD)
 
 GO111MODULE=on go build -ldflags "-X github.com/pingcap/index_advisor/version.GitHash=$GITHASH" -o bin/index-advisor main.go
 
-tar -czf bin/index-advisor-$os-$arch.tar.gz bin/index-advisor
+cd bin
+
+tar -czf index-advisor-$os-$arch.tar.gz index-advisor
