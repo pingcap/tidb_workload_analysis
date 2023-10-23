@@ -2,14 +2,16 @@ package main
 
 import (
 	"github.com/pingcap/index_advisor/cmd"
+	"github.com/pingcap/index_advisor/version"
 	"github.com/spf13/cobra"
 )
 
 var (
 	rootCmd = &cobra.Command{
-		Use:   "TiDB-index-advisor",
-		Short: "TiDB index advisor",
-		Long:  `TiDB index advisor recommends you the best indexes for your workload`,
+		Use:     "TiDB-index-advisor",
+		Short:   "TiDB index advisor",
+		Long:    `TiDB index advisor recommends you the best indexes for your workload`,
+		Version: version.Version(),
 	}
 )
 
