@@ -1,4 +1,6 @@
 .idea
+bin/index-advisor
+./bin/index-advisor
 advise-result
 exec-workload-result
 index_advisor
