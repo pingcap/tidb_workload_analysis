@@ -1,33 +1,28 @@
 #!/bin/sh
 
-repo='https://github.com/pingcap/index_advisor'
+function compile()
+{
+  echo "build for $1-$2"
+  GITHASH=$(git rev-parse HEAD)
+  GO111MODULE=on CGO_ENABLED=0 GOOS=$1 GOARCH=$2 go build -ldflags "-X github.com/pingcap/index_advisor/version.GitHash=$GITHASH" -o bin/index-advisor main.go
+  cd bin
+  tar -czf index-advisor-$1-$2.tar.gz index-advisor
+  cd ..
+}
 
-case $(uname -s) in
-    Linux|linux) os=linux ;;
-    Darwin|darwin) os=darwin ;;
-    *) os= ;;
-esac
+OS=darwin
+ARCH=amd64
+compile $OS $ARCH
 
-if [ -z "$os" ]; then
-    echo "OS $(uname -s) not supported." >&2
-    exit 1
-fi
+OS=darwin
+ARCH=arm64
+compile $OS $ARCH
 
-case $(uname -m) in
-    amd64|x86_64) arch=amd64 ;;
-    arm64|aarch64) arch=arm64 ;;
-    *) arch= ;;
-esac
+OS=linux
+ARCH=amd64
+compile $OS $ARCH
 
-if [ -z "$arch" ]; then
-    echo "Architecture  $(uname -m) not supported." >&2
-    exit 1
-fi
+OS=linux
+ARCH=arm64
+compile $OS $ARCH
 
-GITHASH=$(git rev-parse HEAD)
-
-GO111MODULE=on go build -ldflags "-X github.com/pingcap/index_advisor/version.GitHash=$GITHASH" -o bin/index-advisor main.go
-
-cd bin
-
-tar -czf index-advisor-$os-$arch.tar.gz index-advisor
