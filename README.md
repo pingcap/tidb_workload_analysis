@@ -415,4 +415,5 @@ CREATE TABLE `customer`
 ## Future Plans
 
 - Support index deletion recommendation
+- Support multi-valued indexes
 - Integrate this tool with `TiUP` and `TiDB Cloud`
