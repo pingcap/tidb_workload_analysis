@@ -5,7 +5,6 @@ import (
 
 	"github.com/pingcap/index_advisor/utils"
 	"github.com/pingcap/parser/ast"
-	"github.com/pingcap/parser/mysql"
 	"github.com/pingcap/parser/opcode"
 	_ "github.com/pingcap/tidb/types/parser_driver"
 )
@@ -61,28 +60,13 @@ func (v *simpleIndexableColumnsVisitor) collectColumn(n ast.Node) {
 			// TODO: log or return this error?
 		}
 		for _, c := range possibleColumns {
-			if !v.checkColumnIndexableByType(c) {
+			if !isIndexableColumnType(c.ColumnType) {
 				continue
 			}
 			v.cols.Add(c)
 			v.currentCols.Add(c)
 		}
 	}
-}
-
-func (v *simpleIndexableColumnsVisitor) checkColumnIndexableByType(c utils.Column) bool {
-	if c.ColumnType == nil {
-		return false
-	}
-	switch c.ColumnType.Tp {
-	case mysql.TypeTiny, mysql.TypeShort, mysql.TypeInt24, mysql.TypeLong, mysql.TypeLonglong, mysql.TypeYear,
-		mysql.TypeFloat, mysql.TypeDouble, mysql.TypeNewDecimal,
-		mysql.TypeDuration, mysql.TypeDate, mysql.TypeDatetime, mysql.TypeTimestamp:
-		return true
-	case mysql.TypeVarchar, mysql.TypeString, mysql.TypeVarString:
-		return c.ColumnType.Flen <= 512
-	}
-	return false
 }
 
 func (v *simpleIndexableColumnsVisitor) matchPossibleColumns(defaultSchemaName, columnName string) (cols []utils.Column, err error) {

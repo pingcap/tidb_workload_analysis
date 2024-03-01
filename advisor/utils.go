@@ -9,7 +9,24 @@ import (
 
 	"github.com/pingcap/index_advisor/optimizer"
 	"github.com/pingcap/index_advisor/utils"
+	"github.com/pingcap/parser/mysql"
+	"github.com/pingcap/parser/types"
 )
+
+func isIndexableColumnType(tp *types.FieldType) bool {
+	if tp == nil {
+		return false
+	}
+	switch tp.Tp {
+	case mysql.TypeTiny, mysql.TypeShort, mysql.TypeInt24, mysql.TypeLong, mysql.TypeLonglong, mysql.TypeYear,
+		mysql.TypeFloat, mysql.TypeDouble, mysql.TypeNewDecimal,
+		mysql.TypeDuration, mysql.TypeDate, mysql.TypeDatetime, mysql.TypeTimestamp:
+		return true
+	case mysql.TypeVarchar, mysql.TypeString, mysql.TypeVarString:
+		return tp.Flen <= 512
+	}
+	return false
+}
 
 func evaluateIndexConfCostConcurrently(info utils.WorkloadInfo, optimizers []optimizer.WhatIfOptimizer,
 	indexes []utils.Set[utils.Index]) (bestSet utils.Set[utils.Index], bestCost utils.IndexConfCost, err error) {
@@ -50,9 +67,11 @@ func evaluateIndexConfCostConcurrently(info utils.WorkloadInfo, optimizers []opt
 
 // evaluateIndexConfCost evaluates the workload cost under the given indexes.
 func evaluateIndexConfCost(info utils.WorkloadInfo, optimizer optimizer.WhatIfOptimizer, indexes utils.Set[utils.Index]) (utils.IndexConfCost, error) {
+	failedIndexes := utils.NewSet[utils.Index]()
 	for _, index := range indexes.ToList() {
 		if err := optimizer.CreateHypoIndex(index); err != nil {
-			return utils.IndexConfCost{}, err
+			utils.Warningf("create %v failed: %v", index.Key(), err)
+			failedIndexes.Add(index)
 		}
 	}
 	var workloadCost float64
@@ -64,6 +83,9 @@ func evaluateIndexConfCost(info utils.WorkloadInfo, optimizer optimizer.WhatIfOp
 		workloadCost += p.PlanCost() * float64(sql.Frequency)
 	}
 	for _, index := range indexes.ToList() {
+		if failedIndexes.Contains(index) {
+			continue
+		}
 		if err := optimizer.DropHypoIndex(index); err != nil {
 			return utils.IndexConfCost{}, err
 		}
