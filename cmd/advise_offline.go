@@ -80,6 +80,14 @@ How it work:
 			if opt.qWhiteList != "" || opt.qBlackList != "" {
 				queries = utils.FilterQueries(queries, strings.Split(opt.qWhiteList, ","), strings.Split(opt.qBlackList, ","))
 			}
+			querySetSize := queries.Size()
+			queries, err = filterSQLAccessingSystemTables(queries)
+			if err != nil {
+				return err
+			}
+			if queries.Size() < querySetSize {
+				utils.Infof("filter %v queries accessing system tables", querySetSize-queries.Size())
+			}
 			if queries.Size() == 0 {
 				utils.Infof("no query needs to be analyzed")
 				return nil
