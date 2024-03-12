@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path"
 	"sort"
 	"strings"
 	"time"
@@ -43,6 +42,7 @@ func NewEvaluateCmd() *cobra.Command {
 
 			if opt.qWhiteList != "" || opt.qBlackList != "" {
 				queries = utils.FilterQueries(queries, strings.Split(opt.qWhiteList, ","), strings.Split(opt.qBlackList, ","))
+				utils.Infof("%d queries left after filtering", queries.Size())
 			}
 
 			db, err := optimizer.NewTiDBWhatIfOptimizer(opt.dsn)
@@ -55,89 +55,21 @@ func NewEvaluateCmd() *cobra.Command {
 				return sqls[i].Alias < sqls[j].Alias
 			})
 
-			if opt.indexDirPath == "" {
-				if opt.analyze {
-					return explainQueries(db, queries)
-				} else {
-					return executeQueries(db, queries, opt.output)
-				}
+			if opt.analyze {
+				return explainQueries(db, queries)
+			} else {
+				return executeQueries(db, queries, opt.output)
 			}
-
-			indexFiles, err := os.ReadDir(opt.indexDirPath)
-			if err != nil {
-				return err
-			}
-			for _, indexFile := range indexFiles {
-				if !strings.HasSuffix(indexFile.Name(), ".sql") {
-					continue
-				}
-				utils.Infof("execute queries with index %s", indexFile.Name())
-				indexConfPath := path.Join(opt.indexDirPath, indexFile.Name())
-				if err := executeQueriesWithIndexes(db, queries, indexConfPath, opt.output); err != nil {
-					return err
-				}
-				utils.Infof("finish executing queries with index %s", indexFile.Name())
-			}
-			return nil
 		},
 	}
 
 	cmd.Flags().StringVar(&opt.dsn, "dsn", "root:@tcp(127.0.0.1:4000)/test", "dsn")
 	cmd.Flags().BoolVar(&opt.analyze, "analyze", true, "whether to use `explain analyze`")
 	cmd.Flags().StringVar(&opt.queryPath, "query-path", "", "")
-	cmd.Flags().StringVar(&opt.indexDirPath, "index-dir", "", "")
 	cmd.Flags().StringVar(&opt.qWhiteList, "query-white-list", "", "queries to consider, e.g. 'q1,q2,q6'")
 	cmd.Flags().StringVar(&opt.qBlackList, "query-black-list", "", "queries to ignore, e.g. 'q5,q12'")
 	cmd.Flags().StringVar(&opt.output, "output", "", "output directory to save the result")
 	return cmd
-}
-
-func executeQueriesWithIndexes(db optimizer.WhatIfOptimizer, queries utils.Set[utils.Query], indexConfPath, savePath string) error {
-	// load indexes from indexConfPath into the cluster
-	stmts, err := utils.ParseStmtsFromFile(indexConfPath)
-	if err != nil {
-		return err
-	}
-	indexes := utils.NewSet[utils.Index]()
-	tableNames := utils.NewSet[utils.TableName]()
-	for _, stmt := range stmts {
-		index, err := utils.ParseCreateIndexStmt(stmt)
-		if err != nil {
-			return err
-		}
-		indexes.Add(index)
-		tableNames.Add(utils.TableName{SchemaName: index.SchemaName, TableName: index.TableName})
-	}
-	for _, index := range indexes.ToList() {
-		utils.Infof("execute: %s", index.DDL())
-		if err := db.Execute(index.DDL()); err != nil {
-			return err
-		}
-	}
-	for _, t := range tableNames.ToList() {
-		analyzeStmt := fmt.Sprintf("ANALYZE TABLE %s.%s", t.SchemaName, t.TableName)
-		utils.Infof("execute: %s", analyzeStmt)
-		if err := db.Execute(analyzeStmt); err != nil {
-			return err
-		}
-	}
-
-	// run queries
-	baseName := path.Base(indexConfPath)
-	baseName = strings.TrimSuffix(baseName, path.Ext(baseName))
-	if err := executeQueries(db, queries, path.Join(savePath, baseName)); err != nil {
-		return err
-	}
-
-	// remove indexes in indexConfPath
-	for _, index := range indexes.ToList() {
-		dropStmt := fmt.Sprintf("DROP INDEX %s ON %s.%s", index.IndexName, index.SchemaName, index.TableName)
-		utils.Infof("execute: %s", dropStmt)
-		if err := db.Execute(dropStmt); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func explainQueries(db optimizer.WhatIfOptimizer, queries utils.Set[utils.Query]) error {
