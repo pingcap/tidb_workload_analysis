@@ -1,0 +1,25 @@
+Alias: q135
+Query: 
+/* questionId: d7c8f6df-38d8-44dc-8d36-2729b9611e34 */ SELECT repo_name, description, primary_language, stars, forks FROM github_repos WHERE description LIKE '%network diagrams%' AND description LIKE '%AI Vision%' ORDER BY stars DESC LIMIT 5
+
+Original Cost: 7.64E+09
+Optimized Cost: 7.40E+03
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_7                  5.00            7644486074.12      root                               gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.description, gharchive_dev.github_repos.primary_language, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.forks    
+└─TopN_8                      5.00            7644486071.62      root                               gharchive_dev.github_repos.stars:desc, offset:0, count:5                                                                                                                                         
+  └─TableReader_16            5.00            7644485287.30      root                               data:TopN_15                                                                                                                                                                                     
+    └─TopN_15                 5.00            114667275250.54    cop[tikv]                          gharchive_dev.github_repos.stars:desc, offset:0, count:5                                                                                                                                         
+      └─Selection_14          178517573.60    93983477063.85     cop[tikv]                          like(gharchive_dev.github_repos.description, "%AI Vision%", 92), like(gharchive_dev.github_repos.description, "%network diagrams%", 92)                                                          
+        └─TableFullScan_13    223146967.00    71713409757.25     cop[tikv]    table:github_repos    keep order:false                                                                                                                                                                                 
+
+===================== optimized plan =====================
+Projection_7                       5.00    7395.57    root                                                                                                               gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.description, gharchive_dev.github_repos.primary_language, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.forks    
+└─Limit_12                         5.00    7393.08    root                                                                                                               offset:0, count:5                                                                                                                                                                                
+  └─Projection_21                  5.00    7393.08    root                                                                                                               gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.primary_language, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.forks, gharchive_dev.github_repos.description    
+    └─IndexLookUp_20               5.00    7390.58    root                                                                                                                                                                                                                                                                                                                
+      ├─IndexFullScan_17(Build)    6.25    2137.96    cop[tikv]    table:github_repos, index:idx_stars_primary_language_pushed_at(stars, primary_language, pushed_at)    keep order:true, desc                                                                                                                                                                            
+      └─Selection_19(Probe)        5.00    2632.33    cop[tikv]                                                                                                          like(gharchive_dev.github_repos.description, "%AI Vision%", 92), like(gharchive_dev.github_repos.description, "%network diagrams%", 92)                                                          
+        └─TableRowIDScan_18        6.25    2008.58    cop[tikv]    table:github_repos                                                                                    keep order:false                                                                                                                                                                                 

@@ -1,0 +1,25 @@
+Alias: q142
+Query: 
+/* questionId: f5b3eff7-1943-45f2-91de-1036faca99c6 */ SELECT `repo_name`, `stars` FROM `github_repos` WHERE LOWER(`description`) LIKE LOWER('%token%') AND LOWER(`description`) LIKE LOWER('%.net 6%') ORDER BY `stars` DESC LIMIT 5
+
+Original Cost: 7.64E+09
+Optimized Cost: 7.40E+03
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_7                  5.00            7644485977.15      root                               gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars                                                                     
+└─TopN_8                      5.00            7644485976.16      root                               gharchive_dev.github_repos.stars:desc, offset:0, count:5                                                                                   
+  └─TableReader_16            5.00            7644485231.84      root                               data:TopN_15                                                                                                                               
+    └─TopN_15                 5.00            114667275210.54    cop[tikv]                          gharchive_dev.github_repos.stars:desc, offset:0, count:5                                                                                   
+      └─Selection_14          178517573.60    93983477063.85     cop[tikv]                          like(lower(gharchive_dev.github_repos.description), "%.net 6%", 92), like(lower(gharchive_dev.github_repos.description), "%token%", 92)    
+        └─TableFullScan_13    223146967.00    71713409757.25     cop[tikv]    table:github_repos    keep order:false                                                                                                                           
+
+===================== optimized plan =====================
+Projection_7                       5.00    7400.34    root                                                                                                               gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars                                                                     
+└─Limit_12                         5.00    7399.34    root                                                                                                               offset:0, count:5                                                                                                                          
+  └─Projection_21                  5.00    7399.34    root                                                                                                               gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.description                             
+    └─IndexLookUp_20               5.00    7397.85    root                                                                                                                                                                                                                                                          
+      ├─IndexFullScan_17(Build)    6.25    2413.31    cop[tikv]    table:github_repos, index:idx_stars_primary_language_pushed_at(stars, primary_language, pushed_at)    keep order:true, desc                                                                                                                      
+      └─Selection_19(Probe)        5.00    2632.33    cop[tikv]                                                                                                          like(lower(gharchive_dev.github_repos.description), "%.net 6%", 92), like(lower(gharchive_dev.github_repos.description), "%token%", 92)    
+        └─TableRowIDScan_18        6.25    2008.58    cop[tikv]    table:github_repos                                                                                    keep order:false                                                                                                                           

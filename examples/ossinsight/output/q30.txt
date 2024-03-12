@@ -1,0 +1,24 @@
+Alias: q30
+Query: 
+SELECT DATE(github_repos.pushed_at) AS date, COUNT(*) AS commit_count FROM github_repos WHERE github_repos.primary_language = 'Rust' AND github_repos.pushed_at >= '2023-11-01' AND github_repos.pushed_at <= '2023-12-31' GROUP BY DATE(github_repos.pushed_at)
+
+Original Cost: 7.01E+09
+Optimized Cost: 5.27E+09
+Cost Reduction Ratio: 0.75
+
+
+===================== original plan =====================
+Projection_5                  1.00            7007902242.21      root                               date(gharchive_dev.github_repos.pushed_at)->Column#22, Column#21                                                                                                                                       
+└─HashAgg_8                   1.00            7007902232.13      root                               group by:Column#28, funcs:count(1)->Column#21, funcs:firstrow(Column#27)->gharchive_dev.github_repos.pushed_at                                                                                         
+  └─Projection_16             0.00            7007900714.49      root                               gharchive_dev.github_repos.pushed_at->Column#27, date(gharchive_dev.github_repos.pushed_at)->Column#28                                                                                                 
+    └─TableReader_15          0.00            7007900714.48      root                               data:Selection_14                                                                                                                                                                                      
+      └─Selection_14          0.00            105118510717.15    cop[tikv]                          eq(gharchive_dev.github_repos.primary_language, "Rust"), ge(gharchive_dev.github_repos.pushed_at, 2023-11-01 00:00:00.000000), le(gharchive_dev.github_repos.pushed_at, 2023-12-31 00:00:00.000000)    
+        └─TableFullScan_13    223146967.00    71713409757.25     cop[tikv]    table:github_repos    keep order:false                                                                                                                                                                                       
+
+===================== optimized plan =====================
+Projection_5                  1.00            5270854213.96     root                                                                                                               date(gharchive_dev.github_repos.pushed_at)->Column#22, Column#21                                                                                                                                       
+└─HashAgg_8                   1.00            5270854203.88     root                                                                                                               group by:Column#30, funcs:count(1)->Column#21, funcs:firstrow(Column#29)->gharchive_dev.github_repos.pushed_at                                                                                         
+  └─Projection_21             0.00            5270852686.24     root                                                                                                               gharchive_dev.github_repos.pushed_at->Column#29, date(gharchive_dev.github_repos.pushed_at)->Column#30                                                                                                 
+    └─IndexReader_20          0.00            5270852686.23     root                                                                                                               index:Selection_19                                                                                                                                                                                     
+      └─Selection_19          0.00            79062790293.45    cop[tikv]                                                                                                          eq(gharchive_dev.github_repos.primary_language, "Rust"), ge(gharchive_dev.github_repos.pushed_at, 2023-11-01 00:00:00.000000), le(gharchive_dev.github_repos.pushed_at, 2023-12-31 00:00:00.000000)    
+        └─IndexFullScan_18    223146967.00    45657689333.55    cop[tikv]    table:github_repos, index:idx_stars_primary_language_pushed_at(stars, primary_language, pushed_at)    keep order:false                                                                                                                                                                                       

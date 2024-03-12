@@ -1,0 +1,26 @@
+Alias: q102
+Query: 
+/* questionId: 2962a1ea-cfb1-4fbe-8c5d-50eff88b8f04 */ SELECT `gr`.`repo_name` AS `repo_name`, COUNT(*) AS `stars`, `gr`.`description` AS `description`, `gr`.`primary_language` AS `primary_language` FROM `github_repos` AS `gr` WHERE LOWER(`gr`.`description`) LIKE LOWER('%PDF%') AND LOWER(`gr`.`description`) LIKE LOWER('%HTML%') ORDER BY `stars` DESC LIMIT 20
+
+Original Cost: 6.86E+09
+Optimized Cost: 6.86E+09
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+Projection_8                    1.00            6859436320.92      root                     gharchive_dev.github_repos.repo_name, Column#21, gharchive_dev.github_repos.description, gharchive_dev.github_repos.primary_language                                                                                                             
+└─TopN_11                       1.00            6859436320.52      root                     Column#21:desc, offset:0, count:20                                                                                                                                                                                                               
+  └─HashAgg_23                  1.00            6859435316.86      root                     funcs:count(Column#22)->Column#21, funcs:firstrow(Column#23)->gharchive_dev.github_repos.repo_name, funcs:firstrow(Column#24)->gharchive_dev.github_repos.primary_language, funcs:firstrow(Column#25)->gharchive_dev.github_repos.description    
+    └─TableReader_24            1.00            6859433752.10      root                     data:HashAgg_16                                                                                                                                                                                                                                  
+      └─HashAgg_16              1.00            102891505501.35    cop[tikv]                funcs:count(1)->Column#22, funcs:firstrow(gharchive_dev.github_repos.repo_name)->Column#23, funcs:firstrow(gharchive_dev.github_repos.primary_language)->Column#24, funcs:firstrow(gharchive_dev.github_repos.description)->Column#25            
+        └─Selection_22          178517573.60    93983477063.85     cop[tikv]                like(lower(gharchive_dev.github_repos.description), "%html%", 92), like(lower(gharchive_dev.github_repos.description), "%pdf%", 92)                                                                                                              
+          └─TableFullScan_21    223146967.00    71713409757.25     cop[tikv]    table:gr    keep order:false                                                                                                                                                                                                                                 
+
+===================== optimized plan =====================
+Projection_8                    1.00            6859436320.92      root                     gharchive_dev.github_repos.repo_name, Column#21, gharchive_dev.github_repos.description, gharchive_dev.github_repos.primary_language                                                                                                             
+└─TopN_11                       1.00            6859436320.52      root                     Column#21:desc, offset:0, count:20                                                                                                                                                                                                               
+  └─HashAgg_23                  1.00            6859435316.86      root                     funcs:count(Column#22)->Column#21, funcs:firstrow(Column#23)->gharchive_dev.github_repos.repo_name, funcs:firstrow(Column#24)->gharchive_dev.github_repos.primary_language, funcs:firstrow(Column#25)->gharchive_dev.github_repos.description    
+    └─TableReader_24            1.00            6859433752.10      root                     data:HashAgg_16                                                                                                                                                                                                                                  
+      └─HashAgg_16              1.00            102891505501.35    cop[tikv]                funcs:count(1)->Column#22, funcs:firstrow(gharchive_dev.github_repos.repo_name)->Column#23, funcs:firstrow(gharchive_dev.github_repos.primary_language)->Column#24, funcs:firstrow(gharchive_dev.github_repos.description)->Column#25            
+        └─Selection_22          178517573.60    93983477063.85     cop[tikv]                like(lower(gharchive_dev.github_repos.description), "%html%", 92), like(lower(gharchive_dev.github_repos.description), "%pdf%", 92)                                                                                                              
+          └─TableFullScan_21    223146967.00    71713409757.25     cop[tikv]    table:gr    keep order:false                                                                                                                                                                                                                                 

@@ -1,0 +1,28 @@
+Alias: q64
+Query: 
+SELECT     c.id, ANY_VALUE(c.name) AS name FROM     collection_items ci JOIN collections c ON ci.collection_id = c.id WHERE     ci.repo_id = 88011908 GROUP BY c.id
+
+Original Cost: 3.76E+04
+Optimized Cost: 3.76E+04
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+Projection_9                   1.00       37580.10     root                     gharchive_dev.collections.id, any_value(gharchive_dev.collections.name)->Column#10                                                                                                                                             
+└─HashAgg_10                   1.00       37570.03     root                     group by:gharchive_dev.collections.id, funcs:firstrow(gharchive_dev.collections.id)->gharchive_dev.collections.id, funcs:firstrow(gharchive_dev.collections.name)->gharchive_dev.collections.name                              
+  └─IndexHashJoin_19           1.00       36007.01     root                     inner join, inner:TableReader_14, outer key:gharchive_dev.collection_items.collection_id, inner key:gharchive_dev.collections.id, equal cond:eq(gharchive_dev.collection_items.collection_id, gharchive_dev.collections.id)    
+    ├─TableReader_49(Build)    1.00       33997.76     root                     data:Selection_48                                                                                                                                                                                                              
+    │ └─Selection_48           1.00       509839.61    cop[tikv]                eq(gharchive_dev.collection_items.repo_id, 88011908), not(isnull(gharchive_dev.collection_items.collection_id))                                                                                                                
+    │   └─TableFullScan_47     1408.00    369321.21    cop[tikv]    table:ci    keep order:false                                                                                                                                                                                                               
+    └─TableReader_14(Probe)    1.00       59.71        root                     data:TableRangeScan_13                                                                                                                                                                                                         
+      └─TableRangeScan_13      1.00       297.63       cop[tikv]    table:c     range: decided by [gharchive_dev.collection_items.collection_id], keep order:false                                                                                                                                             
+
+===================== optimized plan =====================
+Projection_9                   1.00       37580.10     root                     gharchive_dev.collections.id, any_value(gharchive_dev.collections.name)->Column#10                                                                                                                                             
+└─HashAgg_10                   1.00       37570.03     root                     group by:gharchive_dev.collections.id, funcs:firstrow(gharchive_dev.collections.id)->gharchive_dev.collections.id, funcs:firstrow(gharchive_dev.collections.name)->gharchive_dev.collections.name                              
+  └─IndexHashJoin_19           1.00       36007.01     root                     inner join, inner:TableReader_14, outer key:gharchive_dev.collection_items.collection_id, inner key:gharchive_dev.collections.id, equal cond:eq(gharchive_dev.collection_items.collection_id, gharchive_dev.collections.id)    
+    ├─TableReader_49(Build)    1.00       33997.76     root                     data:Selection_48                                                                                                                                                                                                              
+    │ └─Selection_48           1.00       509839.61    cop[tikv]                eq(gharchive_dev.collection_items.repo_id, 88011908), not(isnull(gharchive_dev.collection_items.collection_id))                                                                                                                
+    │   └─TableFullScan_47     1408.00    369321.21    cop[tikv]    table:ci    keep order:false                                                                                                                                                                                                               
+    └─TableReader_14(Probe)    1.00       59.71        root                     data:TableRangeScan_13                                                                                                                                                                                                         
+      └─TableRangeScan_13      1.00       297.63       cop[tikv]    table:c     range: decided by [gharchive_dev.collection_items.collection_id], keep order:false                                                                                                                                             

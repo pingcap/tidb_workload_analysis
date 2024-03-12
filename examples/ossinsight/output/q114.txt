@@ -1,0 +1,25 @@
+Alias: q114
+Query: 
+/* questionId: 606c703c-6730-4934-bb1b-057ed6adbcd6 */ SELECT `repo_name`, `stars` FROM `github_repos` WHERE `description` LIKE '%AI%' OR `description` LIKE '%ML%' AND YEAR(`created_at`) = 2023 ORDER BY `stars` DESC LIMIT 20
+
+Original Cost: 8.60E+09
+Optimized Cost: 2.47E+04
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_7                  20.00           8603223675.71      root                               gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars                                                                                                                
+└─TopN_8                      20.00           8603223671.72      root                               gharchive_dev.github_repos.stars:desc, offset:0, count:20                                                                                                                             
+  └─TableReader_16            20.00           8603218666.43      root                               data:TopN_15                                                                                                                                                                          
+    └─TopN_15                 20.00           129048266294.91    cop[tikv]                          gharchive_dev.github_repos.stars:desc, offset:0, count:20                                                                                                                             
+      └─Selection_14          214221088.32    82848443410.55     cop[tikv]                          or(like(gharchive_dev.github_repos.description, "%AI%", 92), and(like(gharchive_dev.github_repos.description, "%ML%", 92), eq(year(gharchive_dev.github_repos.created_at), 2023)))    
+        └─TableFullScan_13    223146967.00    71713409757.25     cop[tikv]    table:github_repos    keep order:false                                                                                                                                                                      
+
+===================== optimized plan =====================
+Projection_7                       20.00    24668.51    root                                                                                                               gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars                                                                                                                
+└─Limit_12                         20.00    24664.51    root                                                                                                               offset:0, count:20                                                                                                                                                                    
+  └─Projection_21                  20.00    24664.51    root                                                                                                               gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.created_at, gharchive_dev.github_repos.description                                 
+    └─IndexLookUp_20               20.00    24656.53    root                                                                                                                                                                                                                                                                                                     
+      ├─IndexFullScan_17(Build)    20.83    8044.36     cop[tikv]    table:github_repos, index:idx_stars_primary_language_pushed_at(stars, primary_language, pushed_at)    keep order:true, desc                                                                                                                                                                 
+      └─Selection_19(Probe)        20.00    7734.85     cop[tikv]                                                                                                          or(like(gharchive_dev.github_repos.description, "%AI%", 92), and(like(gharchive_dev.github_repos.description, "%ML%", 92), eq(year(gharchive_dev.github_repos.created_at), 2023)))    
+        └─TableRowIDScan_18        20.83    6695.27     cop[tikv]    table:github_repos                                                                                    keep order:false                                                                                                                                                                      

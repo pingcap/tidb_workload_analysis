@@ -1,0 +1,22 @@
+Alias: q121
+Query: 
+/* questionId: 01c84d21-4cb0-4f3b-b8ad-489c41e9d309 */ SELECT repo_name, description FROM github_repos WHERE LOWER(repo_name) LIKE '%mern%' OR LOWER(description) LIKE '%mern%' LIMIT 100
+
+Original Cost: 6.76E+03
+Optimized Cost: 6.76E+03
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+Limit_8                     100.00    6758.63     root                               offset:0, count:100                                                                                                                       
+└─TableReader_13            100.00    6758.63     root                               data:Limit_12                                                                                                                             
+  └─Limit_12                100.00    39207.44    cop[tikv]                          offset:0, count:100                                                                                                                       
+    └─Selection_11          100.00    39207.44    cop[tikv]                          or(like(lower(gharchive_dev.github_repos.repo_name), "%mern%", 92), like(lower(gharchive_dev.github_repos.description), "%mern%", 92))    
+      └─TableFullScan_10    105.60    33937.86    cop[tikv]    table:github_repos    keep order:false                                                                                                                          
+
+===================== optimized plan =====================
+Limit_8                     100.00    6758.63     root                               offset:0, count:100                                                                                                                       
+└─TableReader_13            100.00    6758.63     root                               data:Limit_12                                                                                                                             
+  └─Limit_12                100.00    39207.44    cop[tikv]                          offset:0, count:100                                                                                                                       
+    └─Selection_11          100.00    39207.44    cop[tikv]                          or(like(lower(gharchive_dev.github_repos.repo_name), "%mern%", 92), like(lower(gharchive_dev.github_repos.description), "%mern%", 92))    
+      └─TableFullScan_10    105.60    33937.86    cop[tikv]    table:github_repos    keep order:false                                                                                                                          
