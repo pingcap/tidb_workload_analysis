@@ -1,0 +1,26 @@
+Alias: q140
+Query: 
+/* questionId: b0a19908-0942-4cc8-8247-0c1b76f1fcad */ SELECT `repo_name`, `stars` FROM `github_repos` WHERE YEAR(`created_at`) = 2023 ORDER BY `stars` DESC LIMIT 10
+
+Original Cost: 1.08E+09
+Optimized Cost: 1.19E+04
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_7                    10.00           1081801888.81     root                                  gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars    
+└─TopN_10                       10.00           1081801886.81     root                                  gharchive_dev.github_repos.stars:desc, offset:0, count:10                 
+  └─TableReader_22              10.00           1081800015.17     root                                  MppVersion: 2, data:ExchangeSender_21                                     
+    └─ExchangeSender_21         10.00           16226997873.58    mpp[tiflash]                          ExchangeType: PassThrough                                                 
+      └─TopN_20                 10.00           16226997873.58    mpp[tiflash]                          gharchive_dev.github_repos.stars:desc, offset:0, count:10                 
+        └─Selection_19          178517573.60    14803743716.47    mpp[tiflash]                          eq(year(gharchive_dev.github_repos.created_at), 2023)                     
+          └─TableFullScan_18    223146967.00    14268190995.67    mpp[tiflash]    table:github_repos    pushed down filter:empty, keep order:false                                
+
+===================== optimized plan =====================
+Projection_7                      10.00    11850.57    root                                                                              gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars                                           
+└─Projection_28                   10.00    11845.58    root                                                                              gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.created_at    
+  └─IndexLookUp_27                10.00    11842.59    root                                                                              limit embedded(offset:0, count:10)                                                                               
+    ├─Limit_26(Build)             10.00    4450.31     cop[tikv]                                                                         offset:0, count:10                                                                                               
+    │ └─Selection_25              10.00    4450.31     cop[tikv]                                                                         eq(year(gharchive_dev.github_repos.created_at), 2023)                                                            
+    │   └─IndexFullScan_23        12.50    3826.56     cop[tikv]    table:github_repos, index:idx_stars_created_at(stars, created_at)    keep order:true, desc                                                                                            
+    └─TableRowIDScan_24(Probe)    10.00    3629.98     cop[tikv]    table:github_repos                                                   keep order:false                                                                                                 

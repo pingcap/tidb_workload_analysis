@@ -1,0 +1,18 @@
+Alias: q116
+Query: 
+/* questionId: defb4123-fd41-4fc5-836c-1f3d97c307d1 */ SELECT COUNT(*) AS total_event_count FROM github_events WHERE created_at >= '2023-11-01' AND created_at < '2023-12-01'
+
+Original Cost: 6.50E+01
+Optimized Cost: 6.50E+01
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+StreamAgg_12             1.00    64.98     root                                                                                     funcs:count(1)->Column#34                                            
+└─IndexReader_22         0.00    15.08     root         partition:all                                                               index:IndexRangeScan_21                                              
+  └─IndexRangeScan_21    0.00    162.80    cop[tikv]    table:github_events, index:index_github_events_on_created_at(created_at)    range:[2023-11-01 00:00:00,2023-12-01 00:00:00), keep order:false    
+
+===================== optimized plan =====================
+StreamAgg_12             1.00    64.98     root                                                                                     funcs:count(1)->Column#34                                            
+└─IndexReader_22         0.00    15.08     root         partition:all                                                               index:IndexRangeScan_21                                              
+  └─IndexRangeScan_21    0.00    162.80    cop[tikv]    table:github_events, index:index_github_events_on_created_at(created_at)    range:[2023-11-01 00:00:00,2023-12-01 00:00:00), keep order:false    

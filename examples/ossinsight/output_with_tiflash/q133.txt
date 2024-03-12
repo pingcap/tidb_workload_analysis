@@ -1,0 +1,26 @@
+Alias: q133
+Query: 
+/* questionId: 4ef5e61c-e182-40f5-96d0-3cf758ea4921 */ SELECT gr.repo_name AS repo_name, gr.stars AS stars, CONCAT('https://github.com/', gr.repo_name) AS link FROM github_repos gr WHERE gr.description LIKE '%A-Frame%' ORDER BY stars DESC LIMIT 100
+
+Original Cost: 1.18E+09
+Optimized Cost: 1.48E+05
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_7                    100.00          1175850716.29     root                        gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars, concat(https://github.com/, gharchive_dev.github_repos.repo_name)->Column#21    
+└─TopN_10                       100.00          1175849698.33     root                        gharchive_dev.github_repos.stars:desc, offset:0, count:100                                                                                              
+  └─TableReader_22              100.00          1175813245.49     root                        MppVersion: 2, data:ExchangeSender_21                                                                                                                   
+    └─ExchangeSender_21         100.00          17637162382.37    mpp[tiflash]                ExchangeType: PassThrough                                                                                                                               
+      └─TopN_20                 100.00          17637162382.37    mpp[tiflash]                gharchive_dev.github_repos.stars:desc, offset:0, count:100                                                                                              
+        └─Selection_19          178517573.60    14790653350.14    mpp[tiflash]                like(gharchive_dev.github_repos.description, "%A-Frame%", 92)                                                                                           
+          └─TableFullScan_18    223146967.00    14255100629.34    mpp[tiflash]    table:gr    pushed down filter:empty, keep order:false                                                                                                              
+
+===================== optimized plan =====================
+Projection_7                       100.00    148489.66    root                                                                    gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars, concat(https://github.com/, gharchive_dev.github_repos.repo_name)->Column#21    
+└─Limit_12                         100.00    147471.70    root                                                                    offset:0, count:100                                                                                                                                     
+  └─Projection_27                  100.00    147471.70    root                                                                    gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.description                                          
+    └─IndexLookUp_26               100.00    147441.76    root                                                                                                                                                                                                                            
+      ├─IndexFullScan_23(Build)    125.00    40656.82     cop[tikv]    table:gr, index:idx_stars_created_at(stars, created_at)    keep order:true, desc                                                                                                                                   
+      └─Selection_25(Probe)        100.00    46409.12     cop[tikv]                                                               like(gharchive_dev.github_repos.description, "%A-Frame%", 92)                                                                                           
+        └─TableRowIDScan_24        125.00    40171.62     cop[tikv]    table:gr                                                   keep order:false                                                                                                                                        

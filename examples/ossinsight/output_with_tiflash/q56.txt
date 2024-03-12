@@ -1,0 +1,29 @@
+Alias: q56
+Query: 
+SELECT DATE_FORMAT(created_at, '%Y-%m-%d') AS date, COUNT(*) AS submission_count FROM github_repos WHERE primary_language = 'Ruby' AND created_at >= '2023-11-01' AND created_at <= '2023-12-31' GROUP BY date
+
+Original Cost: 8.07E+08
+Optimized Cost: 5.64E+06
+Cost Reduction Ratio: 0.01
+
+
+===================== original plan =====================
+TableReader_41                          1.00    806719941.65      root                                  MppVersion: 2, data:ExchangeSender_40                                                                                                                                                
+└─ExchangeSender_40                     1.00    12100799023.59    mpp[tiflash]                          ExchangeType: PassThrough                                                                                                                                                            
+  └─Projection_6                        1.00    12100799023.59    mpp[tiflash]                          date_format(gharchive_dev.github_repos.created_at, %Y-%m-%d)->Column#22, Column#21                                                                                                   
+    └─Projection_36                     1.00    12100799023.10    mpp[tiflash]                          Column#21, gharchive_dev.github_repos.created_at                                                                                                                                     
+      └─HashAgg_37                      1.00    12100799023.09    mpp[tiflash]                          group by:Column#33, funcs:sum(Column#34)->Column#21, funcs:firstrow(Column#35)->gharchive_dev.github_repos.created_at, stream_count: 8                                               
+        └─ExchangeReceiver_39           1.00    12100798948.05    mpp[tiflash]                          stream_count: 8                                                                                                                                                                      
+          └─ExchangeSender_38           1.00    12100798894.05    mpp[tiflash]                          ExchangeType: HashPartition, Compression: FAST, Hash Cols: [name: Column#33, collate: utf8mb4_general_ci], stream_count: 8                                                           
+            └─HashAgg_35                1.00    12100798894.05    mpp[tiflash]                          group by:Column#37, funcs:count(1)->Column#34, funcs:firstrow(Column#36)->Column#35                                                                                                  
+              └─Projection_42           0.00    12100798820.58    mpp[tiflash]                          gharchive_dev.github_repos.created_at->Column#36, date_format(gharchive_dev.github_repos.created_at, %Y-%m-%d)->Column#37                                                            
+                └─Selection_25          0.00    12100798820.54    mpp[tiflash]                          eq(gharchive_dev.github_repos.primary_language, "Ruby")                                                                                                                              
+                  └─TableFullScan_24    1.37    10494140658.14    mpp[tiflash]    table:github_repos    pushed down filter:ge(gharchive_dev.github_repos.created_at, 2023-11-01 00:00:00.000000), le(gharchive_dev.github_repos.created_at, 2023-12-31 00:00:00.000000), keep order:false    
+
+===================== optimized plan =====================
+Projection_5                   1.00         5635570.90     root                                                                                                                         date_format(gharchive_dev.github_repos.created_at, %Y-%m-%d)->Column#22, Column#21                                                              
+└─HashAgg_9                    1.00         5635560.82     root                                                                                                                         group by:Column#39, funcs:count(1)->Column#21, funcs:firstrow(Column#38)->gharchive_dev.github_repos.created_at                                 
+  └─Projection_42              0.00         5634043.06     root                                                                                                                         gharchive_dev.github_repos.created_at->Column#38, date_format(gharchive_dev.github_repos.created_at, %Y-%m-%d)->Column#39                       
+    └─IndexReader_23           0.00         5634043.02     root                                                                                                                         index:Selection_22                                                                                                                              
+      └─Selection_22           0.00         84510645.00    cop[tikv]                                                                                                                    ge(gharchive_dev.github_repos.created_at, 2023-11-01 00:00:00.000000), le(gharchive_dev.github_repos.created_at, 2023-12-31 00:00:00.000000)    
+        └─IndexRangeScan_21    223146.97    62240577.69    cop[tikv]    table:github_repos, index:idx_primary_language_repo_name_created_at(primary_language, repo_name, created_at)    range:["Ruby","Ruby"], keep order:false                                                                                                         

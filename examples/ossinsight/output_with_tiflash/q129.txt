@@ -1,0 +1,26 @@
+Alias: q129
+Query: 
+/* questionId: d7c8f6df-38d8-44dc-8d36-2729b9611e34 */ SELECT repo_name, description, primary_language, stars, forks FROM github_repos WHERE description LIKE '%network diagrams%' AND description LIKE '%AI Vision%' ORDER BY stars DESC LIMIT 5
+
+Original Cost: 1.16E+09
+Optimized Cost: 7.38E+03
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_7                    5.00            1164949697.14     root                                  gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.description, gharchive_dev.github_repos.primary_language, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.forks    
+└─TopN_10                       5.00            1164949694.64     root                                  gharchive_dev.github_repos.stars:desc, offset:0, count:5                                                                                                                                         
+  └─TableReader_22              5.00            1164948910.32     root                                  MppVersion: 2, data:ExchangeSender_21                                                                                                                                                            
+    └─ExchangeSender_21         5.00            17474231399.86    mpp[tiflash]                          ExchangeType: PassThrough                                                                                                                                                                        
+      └─TopN_20                 5.00            17474231399.86    mpp[tiflash]                          gharchive_dev.github_repos.stars:desc, offset:0, count:5                                                                                                                                         
+        └─Selection_19          178517573.60    16479419421.63    mpp[tiflash]                          like(gharchive_dev.github_repos.description, "%AI Vision%", 92), like(gharchive_dev.github_repos.description, "%network diagrams%", 92)                                                          
+          └─TableFullScan_18    223146967.00    15408313980.03    mpp[tiflash]    table:github_repos    pushed down filter:empty, keep order:false                                                                                                                                                       
+
+===================== optimized plan =====================
+Projection_7                       5.00    7382.88    root                                                                              gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.description, gharchive_dev.github_repos.primary_language, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.forks    
+└─Limit_12                         5.00    7380.38    root                                                                              offset:0, count:5                                                                                                                                                                                
+  └─Projection_27                  5.00    7380.38    root                                                                              gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.primary_language, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.forks, gharchive_dev.github_repos.description    
+    └─IndexLookUp_26               5.00    7377.89    root                                                                                                                                                                                                                                                                               
+      ├─IndexFullScan_23(Build)    6.25    2032.84    cop[tikv]    table:github_repos, index:idx_stars_created_at(stars, created_at)    keep order:true, desc                                                                                                                                                                            
+      └─Selection_25(Probe)        5.00    2632.33    cop[tikv]                                                                         like(gharchive_dev.github_repos.description, "%AI Vision%", 92), like(gharchive_dev.github_repos.description, "%network diagrams%", 92)                                                          
+        └─TableRowIDScan_24        6.25    2008.58    cop[tikv]    table:github_repos                                                   keep order:false                                                                                                                                                                                 

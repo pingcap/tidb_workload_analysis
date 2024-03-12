@@ -1,0 +1,22 @@
+Alias: q75
+Query: 
+/* questionId: cc5ba7b5-6926-4911-af27-e9c3847566c5 */ SELECT `repo_name`, `stars`, `forks` FROM `github_repos` ORDER BY `stars` DESC, `forks` DESC LIMIT 10
+
+Original Cost: 1.07E+09
+Optimized Cost: 1.07E+09
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+TopN_9                      10.00           1068946582.73     root                                  gharchive_dev.github_repos.stars:desc, gharchive_dev.github_repos.forks:desc, offset:0, count:10    
+└─TableReader_19            10.00           1068944711.09     root                                  MppVersion: 2, data:ExchangeSender_18                                                               
+  └─ExchangeSender_18       10.00           16034168312.36    mpp[tiflash]                          ExchangeType: PassThrough                                                                           
+    └─TopN_17               10.00           16034168312.36    mpp[tiflash]                          gharchive_dev.github_repos.stars:desc, gharchive_dev.github_repos.forks:desc, offset:0, count:10    
+      └─TableFullScan_16    223146967.00    14255100629.34    mpp[tiflash]    table:github_repos    keep order:false                                                                                    
+
+===================== optimized plan =====================
+TopN_9                      10.00           1068946582.73     root                                  gharchive_dev.github_repos.stars:desc, gharchive_dev.github_repos.forks:desc, offset:0, count:10    
+└─TableReader_19            10.00           1068944711.09     root                                  MppVersion: 2, data:ExchangeSender_18                                                               
+  └─ExchangeSender_18       10.00           16034168312.36    mpp[tiflash]                          ExchangeType: PassThrough                                                                           
+    └─TopN_17               10.00           16034168312.36    mpp[tiflash]                          gharchive_dev.github_repos.stars:desc, gharchive_dev.github_repos.forks:desc, offset:0, count:10    
+      └─TableFullScan_16    223146967.00    14255100629.34    mpp[tiflash]    table:github_repos    keep order:false                                                                                    

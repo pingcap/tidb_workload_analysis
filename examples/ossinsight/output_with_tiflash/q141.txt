@@ -1,0 +1,26 @@
+Alias: q141
+Query: 
+/* questionId: 3c51b383-8e50-47c5-b925-ae29f4c46555 */ SELECT repo_name, primary_language, stars, created_at FROM github_repos WHERE description LIKE '%AI%' ORDER BY stars DESC, created_at DESC LIMIT 10
+
+Original Cost: 1.16E+09
+Optimized Cost: 1.48E+04
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_7                    10.00           1158451576.99     root                                  gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.primary_language, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.created_at    
+└─TopN_10                       10.00           1158451572.99     root                                  gharchive_dev.github_repos.stars:desc, gharchive_dev.github_repos.created_at:desc, offset:0, count:10                                                         
+  └─TableReader_22              10.00           1158449505.35     root                                  MppVersion: 2, data:ExchangeSender_21                                                                                                                         
+    └─ExchangeSender_21         10.00           17376738070.27    mpp[tiflash]                          ExchangeType: PassThrough                                                                                                                                     
+      └─TopN_20                 10.00           17376738070.27    mpp[tiflash]                          gharchive_dev.github_repos.stars:desc, gharchive_dev.github_repos.created_at:desc, offset:0, count:10                                                         
+        └─Selection_19          178517573.60    15953483864.15    mpp[tiflash]                          like(gharchive_dev.github_repos.description, "%AI%", 92)                                                                                                      
+          └─TableFullScan_18    223146967.00    15417931143.35    mpp[tiflash]    table:github_repos    pushed down filter:empty, keep order:false                                                                                                                    
+
+===================== optimized plan =====================
+Projection_7                       10.00    14750.21    root                                                                              gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.primary_language, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.created_at                                            
+└─Limit_12                         10.00    14746.21    root                                                                              offset:0, count:10                                                                                                                                                                                    
+  └─Projection_27                  10.00    14746.21    root                                                                              gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.primary_language, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.created_at, gharchive_dev.github_repos.description    
+    └─IndexLookUp_26               10.00    14741.22    root                                                                                                                                                                                                                                                                                    
+      ├─IndexFullScan_23(Build)    12.50    3826.56     cop[tikv]    table:github_repos, index:idx_stars_created_at(stars, created_at)    keep order:true, desc                                                                                                                                                                                 
+      └─Selection_25(Probe)        10.00    4640.91     cop[tikv]                                                                         like(gharchive_dev.github_repos.description, "%AI%", 92)                                                                                                                                              
+        └─TableRowIDScan_24        12.50    4017.16     cop[tikv]    table:github_repos                                                   keep order:false                                                                                                                                                                                      

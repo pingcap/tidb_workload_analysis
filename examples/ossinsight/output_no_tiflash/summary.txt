@@ -1,0 +1,43 @@
+Total Queries in the workload: 133
+Total number of indexes: 5
+  CREATE INDEX idx_type_actor_id_actor_login ON gharchive_dev.github_events (type, actor_id, actor_login);
+  CREATE INDEX idx_type_actor_id_repo_name ON gharchive_dev.github_events (type, actor_id, repo_name);
+  CREATE INDEX idx_type_repo_id_action ON gharchive_dev.github_events (type, repo_id, action);
+  CREATE INDEX idx_primary_language_created_at_repo_name ON gharchive_dev.github_repos (primary_language, created_at, repo_name);
+  CREATE INDEX idx_stars_primary_language_pushed_at ON gharchive_dev.github_repos (stars, primary_language, pushed_at);
+Total original workload cost: 1.80E+12
+Total optimized workload cost: 9.65E+11
+Total cost reduction ratio: 46.49%
+Top 10 queries with the most cost reduction ratio:
+  Alias: q20, Cost Reduction Ratio: 4.43E+10->2.26E+04(0.00)
+  Alias: q129, Cost Reduction Ratio: 7.64E+09->7.40E+03(0.00)
+  Alias: q136, Cost Reduction Ratio: 7.64E+09->7.40E+03(0.00)
+  Alias: q135, Cost Reduction Ratio: 7.63E+09->7.45E+03(0.00)
+  Alias: q83, Cost Reduction Ratio: 6.90E+09->7.40E+03(0.00)
+  Alias: q73, Cost Reduction Ratio: 7.89E+09->1.23E+04(0.00)
+  Alias: q130, Cost Reduction Ratio: 7.89E+09->1.23E+04(0.00)
+  Alias: q132, Cost Reduction Ratio: 7.50E+09->1.48E+04(0.00)
+  Alias: q91, Cost Reduction Ratio: 7.50E+09->1.48E+04(0.00)
+  Alias: q121, Cost Reduction Ratio: 7.50E+09->1.48E+04(0.00)
+Top 10 queries with the most cost reduction number:
+  Alias: q8, Cost Reduction Ratio: 8.67E+10->6.62E+08(0.01)
+  Alias: q11, Cost Reduction Ratio: 8.67E+10->6.62E+08(0.01)
+  Alias: q127, Cost Reduction Ratio: 7.08E+10->2.78E+09(0.04)
+  Alias: q110, Cost Reduction Ratio: 7.24E+10->1.13E+10(0.16)
+  Alias: q84, Cost Reduction Ratio: 1.03E+11->5.16E+10(0.50)
+  Alias: q99, Cost Reduction Ratio: 7.86E+10->3.03E+10(0.39)
+  Alias: q37, Cost Reduction Ratio: 7.86E+10->3.03E+10(0.39)
+  Alias: q93, Cost Reduction Ratio: 7.75E+10->2.92E+10(0.38)
+  Alias: q20, Cost Reduction Ratio: 4.43E+10->2.26E+04(0.00)
+  Alias: q76, Cost Reduction Ratio: 6.09E+10->1.93E+10(0.32)
+Top 10 queries with the most cost:
+  Alias: q88, Cost Reduction Ratio: 1.91E+11->1.91E+11(1.00)
+  Alias: q104, Cost Reduction Ratio: 1.84E+11->1.84E+11(1.00)
+  Alias: q125, Cost Reduction Ratio: 1.50E+11->1.50E+11(1.00)
+  Alias: q84, Cost Reduction Ratio: 1.03E+11->5.16E+10(0.50)
+  Alias: q45, Cost Reduction Ratio: 7.30E+10->5.78E+10(0.79)
+  Alias: q99, Cost Reduction Ratio: 7.86E+10->3.03E+10(0.39)
+  Alias: q37, Cost Reduction Ratio: 7.86E+10->3.03E+10(0.39)
+  Alias: q93, Cost Reduction Ratio: 7.75E+10->2.92E+10(0.38)
+  Alias: q11, Cost Reduction Ratio: 8.67E+10->6.62E+08(0.01)
+  Alias: q8, Cost Reduction Ratio: 8.67E+10->6.62E+08(0.01)

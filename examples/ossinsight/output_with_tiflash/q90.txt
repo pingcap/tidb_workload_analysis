@@ -1,0 +1,22 @@
+Alias: q90
+Query: 
+/* questionId: 33fdae78-2195-4ef0-8f6d-73bd4b909152 */ SELECT repo_name, description, created_at FROM github_repos WHERE description LIKE '%Vercel%' AND description LIKE '%TiDB%' AND MONTH(created_at) = 5
+
+Original Cost: 2.30E+09
+Optimized Cost: 2.30E+09
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+Projection_4               178517573.60    2301411601.82     root                                  gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.description, gharchive_dev.github_repos.created_at                                                              
+└─TableReader_12           178517573.60    2247963440.29     root                                  MppVersion: 2, data:ExchangeSender_11                                                                                                                                            
+  └─ExchangeSender_11      178517573.60    15861758791.74    mpp[tiflash]                          ExchangeType: PassThrough                                                                                                                                                        
+    └─Selection_10         178517573.60    15861758791.74    mpp[tiflash]                          eq(month(gharchive_dev.github_repos.created_at), 5), like(gharchive_dev.github_repos.description, "%TiDB%", 92), like(gharchive_dev.github_repos.description, "%Vercel%", 92)    
+      └─TableFullScan_9    223146967.00    14255100629.34    mpp[tiflash]    table:github_repos    pushed down filter:empty, keep order:false                                                                                                                                       
+
+===================== optimized plan =====================
+Projection_4               178517573.60    2301411601.82     root                                  gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.description, gharchive_dev.github_repos.created_at                                                              
+└─TableReader_12           178517573.60    2247963440.29     root                                  MppVersion: 2, data:ExchangeSender_11                                                                                                                                            
+  └─ExchangeSender_11      178517573.60    15861758791.74    mpp[tiflash]                          ExchangeType: PassThrough                                                                                                                                                        
+    └─Selection_10         178517573.60    15861758791.74    mpp[tiflash]                          eq(month(gharchive_dev.github_repos.created_at), 5), like(gharchive_dev.github_repos.description, "%TiDB%", 92), like(gharchive_dev.github_repos.description, "%Vercel%", 92)    
+      └─TableFullScan_9    223146967.00    14255100629.34    mpp[tiflash]    table:github_repos    pushed down filter:empty, keep order:false                                                                                                                                       

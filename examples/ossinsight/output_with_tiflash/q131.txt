@@ -1,0 +1,26 @@
+Alias: q131
+Query: 
+/* questionId: efc77fe8-c0ab-483a-bd69-c1a6402accf9 */ SELECT gr.repo_name AS repo_name, gr.updated_at AS updated_at FROM github_repos gr WHERE gr.description LIKE '%LLM%' ORDER BY gr.updated_at DESC LIMIT 1
+
+Original Cost: 9.86E+08
+Optimized Cost: 1.47E+03
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_7                    1.00            986043614.63      root                        gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.updated_at    
+└─TopN_10                       1.00            986043614.43      root                        gharchive_dev.github_repos.updated_at:desc, offset:0, count:1                  
+  └─TableReader_22              1.00            986043581.43      root                        MppVersion: 2, data:ExchangeSender_21                                          
+    └─ExchangeSender_21         1.00            14790653358.39    mpp[tiflash]                ExchangeType: PassThrough                                                      
+      └─TopN_20                 1.00            14790653358.39    mpp[tiflash]                gharchive_dev.github_repos.updated_at:desc, offset:0, count:1                  
+        └─Selection_19          178517573.60    14790653350.14    mpp[tiflash]                like(gharchive_dev.github_repos.description, "%LLM%", 92)                      
+          └─TableFullScan_18    223146967.00    14255100629.34    mpp[tiflash]    table:gr    pushed down filter:empty, keep order:false                                     
+
+===================== optimized plan =====================
+Projection_7                       1.00    1471.07    root                                                       gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.updated_at                                            
+└─Limit_12                         1.00    1470.87    root                                                       offset:0, count:1                                                                                                      
+  └─Projection_27                  1.00    1470.87    root                                                       gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.updated_at, gharchive_dev.github_repos.description    
+    └─IndexLookUp_26               1.00    1470.57    root                                                                                                                                                                              
+      ├─IndexFullScan_23(Build)    1.25    350.62     cop[tikv]    table:gr, index:idx_updated_at(updated_at)    keep order:true, desc                                                                                                  
+      └─Selection_25(Probe)        1.00    464.09     cop[tikv]                                                  like(gharchive_dev.github_repos.description, "%LLM%", 92)                                                              
+        └─TableRowIDScan_24        1.25    401.72     cop[tikv]    table:gr                                      keep order:false                                                                                                       

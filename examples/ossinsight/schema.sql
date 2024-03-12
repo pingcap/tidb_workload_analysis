@@ -154,3 +154,11 @@ PARTITION BY LIST COLUMNS(`type`)
  PARTITION `download_event` VALUES IN ('DownloadEvent'),
  PARTITION `team_add_event` VALUES IN ('TeamAddEvent'),
  PARTITION `fork_apply_event` VALUES IN ('ForkApplyEvent'));
+
+-- alter table blacklist_repos set tiflash replica 1;
+-- alter table blacklist_users set tiflash replica 1;
+-- alter table collection_items set tiflash replica 1;
+-- alter table collections set tiflash replica 1;
+-- alter table github_repos set tiflash replica 1;
+-- alter table github_users set tiflash replica 1;
+-- alter table github_events set tiflash replica 1;

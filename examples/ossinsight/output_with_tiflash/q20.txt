@@ -1,0 +1,32 @@
+Alias: q20
+Query: 
+SELECT repo_name, stars FROM github_repos WHERE owner_login IN (SELECT login FROM github_users WHERE country_code = 'CN') ORDER BY stars DESC LIMIT 10
+
+Original Cost: 1.47E+09
+Optimized Cost: 2.25E+04
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_11                             10.00           1467983096.97     root                                  gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars                             
+└─TopN_15                                 10.00           1467983094.97     root                                  gharchive_dev.github_repos.stars:desc, offset:0, count:10                                          
+  └─TableReader_57                        10.00           1467980953.33     root                                  MppVersion: 2, data:ExchangeSender_56                                                              
+    └─ExchangeSender_56                   10.00           22019708975.91    mpp[tiflash]                          ExchangeType: PassThrough                                                                          
+      └─TopN_55                           10.00           22019708975.91    mpp[tiflash]                          gharchive_dev.github_repos.stars:desc, offset:0, count:10                                          
+        └─HashJoin_54                     178517573.60    20596454751.29    mpp[tiflash]                          semi join, equal:[eq(gharchive_dev.github_repos.owner_login, gharchive_dev.github_users.login)]    
+          ├─ExchangeReceiver_36(Build)    394886.00       5392258594.33     mpp[tiflash]                                                                                                                             
+          │ └─ExchangeSender_35           394886.00       5363092314.37     mpp[tiflash]                          ExchangeType: Broadcast, Compression: FAST                                                         
+          │   └─Projection_68             394886.00       5133358776.79     mpp[tiflash]                          gharchive_dev.github_users.login                                                                   
+          │     └─TableFullScan_33        394886.00       5133319367.17     mpp[tiflash]    table:github_users    pushed down filter:eq(gharchive_dev.github_users.country_code, "CN"), keep order:false             
+          └─TableFullScan_32(Probe)       223146967.00    14846367157.27    mpp[tiflash]    table:github_repos    keep order:false                                                                                   
+
+===================== optimized plan =====================
+Limit_18                            10.00    22506.66    root                                                                                                                                              offset:0, count:10                                                                                                                                                                                                        
+└─IndexJoin_61                      10.00    22506.66    root                                                                                                                                              semi join, inner:IndexReader_60, outer key:gharchive_dev.github_repos.owner_login, inner key:gharchive_dev.github_users.login, equal cond:eq(gharchive_dev.github_repos.owner_login, gharchive_dev.github_users.login)    
+  ├─Projection_71(Build)            12.50    14746.02    root                                                                                                                                              gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.owner_login, gharchive_dev.github_repos.stars                                                                                                            
+  │ └─IndexLookUp_70                12.50    14742.27    root                                                                                                                                                                                                                                                                                                                                                                        
+  │   ├─IndexFullScan_68(Build)     12.50    4065.68     cop[tikv]    table:github_repos, index:idx_stars_created_at(stars, created_at)                                                                    keep order:true, desc                                                                                                                                                                                                     
+  │   └─TableRowIDScan_69(Probe)    12.50    4017.16     cop[tikv]    table:github_repos                                                                                                                   keep order:false                                                                                                                                                                                                          
+  └─IndexReader_60(Probe)           0.13     59.37       root                                                                                                                                              index:Selection_59                                                                                                                                                                                                        
+    └─Selection_59                  0.13     889.61      cop[tikv]                                                                                                                                         eq(gharchive_dev.github_users.country_code, "CN")                                                                                                                                                                         
+      └─IndexRangeScan_58           31.02    765.79      cop[tikv]    table:github_users, index:index_gu_on_login_is_bot_organization_country_code(login, is_bot, organization_formatted, country_code)    range: decided by [eq(gharchive_dev.github_users.login, gharchive_dev.github_repos.owner_login)], keep order:false                                                                                                        

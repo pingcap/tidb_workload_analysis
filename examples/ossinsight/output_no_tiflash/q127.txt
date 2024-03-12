@@ -1,0 +1,25 @@
+Alias: q127
+Query: 
+/* questionId: 2fee75dc-8e27-4bdc-8d3e-fac174163587 */ SELECT `repo_name`, COUNT(*) AS `num_of_issues` FROM `github_events` WHERE `type` = 'IssuesEvent' GROUP BY `repo_name` ORDER BY `num_of_issues` DESC LIMIT 1
+
+Original Cost: 7.08E+10
+Optimized Cost: 2.78E+09
+Cost Reduction Ratio: 0.04
+
+
+===================== original plan =====================
+Projection_8                    1.00             70792879918.96      root                                   gharchive_dev.github_events.repo_name, Column#34                                                                                                                                   
+└─TopN_11                       1.00             70792879918.76      root                                   Column#34:desc, offset:0, count:1                                                                                                                                                  
+  └─HashAgg_23                  8017514.00       70792879899.96      root                                   group by:gharchive_dev.github_events.repo_name, funcs:count(Column#35)->Column#34, funcs:firstrow(gharchive_dev.github_events.repo_name)->gharchive_dev.github_events.repo_name    
+    └─TableReader_24            8017514.00       70281843663.83      root         partition:issues_event    data:HashAgg_16                                                                                                                                                                    
+      └─HashAgg_16              8017514.00       1051243215544.50    cop[tikv]                              group by:gharchive_dev.github_events.repo_name, funcs:count(1)->Column#35                                                                                                          
+        └─Selection_22          91338283.00      1048309254861.66    cop[tikv]                              eq(gharchive_dev.github_events.type, "IssuesEvent")                                                                                                                                
+          └─TableFullScan_21    2526854492.00    922219215710.86     cop[tikv]    table:github_events       keep order:false                                                                                                                                                                   
+
+===================== optimized plan =====================
+Projection_8                   1.00            2784998639.20     root                                                                                              gharchive_dev.github_events.repo_name, Column#34                                                                                                                                   
+└─TopN_11                      1.00            2784998639.00     root                                                                                              Column#34:desc, offset:0, count:1                                                                                                                                                  
+  └─HashAgg_22                 8017514.00      2784998620.20     root                                                                                              group by:gharchive_dev.github_events.repo_name, funcs:count(Column#36)->Column#34, funcs:firstrow(gharchive_dev.github_events.repo_name)->gharchive_dev.github_events.repo_name    
+    └─IndexReader_23           8017514.00      2273962384.08     root         partition:issues_event                                                               index:HashAgg_16                                                                                                                                                                   
+      └─HashAgg_16             8017514.00      31124996348.20    cop[tikv]                                                                                         group by:gharchive_dev.github_events.repo_name, funcs:count(1)->Column#36                                                                                                          
+        └─IndexRangeScan_21    114172853.75    27505089726.94    cop[tikv]    table:github_events, index:idx_type_actor_id_repo_name(type, actor_id, repo_name)    range:["IssuesEvent","IssuesEvent"], keep order:false                                                                                                                              

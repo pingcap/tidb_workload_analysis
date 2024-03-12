@@ -1,0 +1,24 @@
+Alias: q67
+Query: 
+/* questionId: 1c6f7d0a-c5d7-4ac2-8c5a-db21b020162c */ SELECT COUNT(*) AS `count` FROM `github_repos` WHERE `repo_name` LIKE '%autogen%'
+
+Original Cost: 8.88E+08
+Optimized Cost: 8.88E+08
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+HashAgg_32                    1.00            888142196.19      root                                  funcs:count(Column#23)->Column#21                              
+└─TableReader_34              1.00            888140668.93      root                                  MppVersion: 2, data:ExchangeSender_33                          
+  └─ExchangeSender_33         1.00            13322110016.38    mpp[tiflash]                          ExchangeType: PassThrough                                      
+    └─HashAgg_10              1.00            13322110016.38    mpp[tiflash]                          funcs:count(1)->Column#23                                      
+      └─Selection_31          178517573.60    13150733073.16    mpp[tiflash]                          like(gharchive_dev.github_repos.repo_name, "%autogen%", 92)    
+        └─TableFullScan_30    223146967.00    12615180352.36    mpp[tiflash]    table:github_repos    pushed down filter:empty, keep order:false                     
+
+===================== optimized plan =====================
+HashAgg_42                    1.00            888142196.19      root                                  funcs:count(Column#31)->Column#21                              
+└─TableReader_44              1.00            888140668.93      root                                  MppVersion: 2, data:ExchangeSender_43                          
+  └─ExchangeSender_43         1.00            13322110016.38    mpp[tiflash]                          ExchangeType: PassThrough                                      
+    └─HashAgg_10              1.00            13322110016.38    mpp[tiflash]                          funcs:count(1)->Column#31                                      
+      └─Selection_41          178517573.60    13150733073.16    mpp[tiflash]                          like(gharchive_dev.github_repos.repo_name, "%autogen%", 92)    
+        └─TableFullScan_40    223146967.00    12615180352.36    mpp[tiflash]    table:github_repos    pushed down filter:empty, keep order:false                     

@@ -1,0 +1,23 @@
+Alias: q139
+Query: 
+/* questionId: 88cc66fc-012d-46a4-8e5d-5dd8c811231c */ SELECT gr.repo_name AS repo_name, CONCAT('https://github.com/', gr.repo_name) AS link FROM github_repos gr WHERE gr.primary_language = 'aframe' ORDER BY gr.stars DESC LIMIT 100
+
+Original Cost: 9.89E+08
+Optimized Cost: 7.96E+05
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_9                  100.00    988534873.51      root                        gharchive_dev.github_repos.repo_name, concat(https://github.com/, gharchive_dev.github_repos.repo_name)->Column#23    
+└─TopN_12                     100.00    988533865.53      root                        gharchive_dev.github_repos.stars:desc, offset:0, count:100                                                            
+  └─TableReader_24            100.00    988498092.69      root                        MppVersion: 2, data:ExchangeSender_23                                                                                 
+    └─ExchangeSender_23       100.00    14827442570.38    mpp[tiflash]                ExchangeType: PassThrough                                                                                             
+      └─TopN_22               100.00    14827442570.38    mpp[tiflash]                gharchive_dev.github_repos.stars:desc, offset:0, count:100                                                            
+        └─TableFullScan_20    633.61    14291879091.57    mpp[tiflash]    table:gr    pushed down filter:eq(gharchive_dev.github_repos.primary_language, "aframe"), keep order:false                        
+
+===================== optimized plan =====================
+Projection_9                 100.00      795849.76      root                                                                                                     gharchive_dev.github_repos.repo_name, concat(https://github.com/, gharchive_dev.github_repos.repo_name)->Column#23    
+└─Limit_13                   100.00      794841.78      root                                                                                                     offset:0, count:100                                                                                                   
+  └─IndexReader_26           100.00      794841.78      root                                                                                                     index:Limit_25                                                                                                        
+    └─Limit_25               100.00      11870750.65    cop[tikv]                                                                                                offset:0, count:100                                                                                                   
+      └─IndexRangeScan_24    35218.56    11870750.65    cop[tikv]    table:gr, index:idx_primary_language_stars_repo_name(primary_language, stars, repo_name)    range:["aframe","aframe"], keep order:true, desc                                                                      

@@ -1,0 +1,23 @@
+Alias: q56
+Query: 
+SELECT DATE_FORMAT(created_at, '%Y-%m-%d') AS date, COUNT(*) AS submission_count FROM github_repos WHERE primary_language = 'Ruby' AND created_at >= '2023-11-01' AND created_at <= '2023-12-31' GROUP BY date
+
+Original Cost: 7.01E+09
+Optimized Cost: 1.22E+06
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_5                  1.00            7007902242.37      root                               date_format(gharchive_dev.github_repos.created_at, %Y-%m-%d)->Column#22, Column#21                                                                                                                       
+└─HashAgg_8                   1.00            7007902232.29      root                               group by:Column#28, funcs:count(1)->Column#21, funcs:firstrow(Column#27)->gharchive_dev.github_repos.created_at                                                                                          
+  └─Projection_16             0.00            7007900714.53      root                               gharchive_dev.github_repos.created_at->Column#27, date_format(gharchive_dev.github_repos.created_at, %Y-%m-%d)->Column#28                                                                                
+    └─TableReader_15          0.00            7007900714.49      root                               data:Selection_14                                                                                                                                                                                        
+      └─Selection_14          0.00            105118510717.15    cop[tikv]                          eq(gharchive_dev.github_repos.primary_language, "Ruby"), ge(gharchive_dev.github_repos.created_at, 2023-11-01 00:00:00.000000), le(gharchive_dev.github_repos.created_at, 2023-12-31 00:00:00.000000)    
+        └─TableFullScan_13    223146967.00    71713409757.25     cop[tikv]    table:github_repos    keep order:false                                                                                                                                                                                         
+
+===================== optimized plan =====================
+Projection_5                1.00        1224610.09     root                                                                                                                         date_format(gharchive_dev.github_repos.created_at, %Y-%m-%d)->Column#22, Column#21                                                                                      
+└─HashAgg_10                1.00        1224600.01     root                                                                                                                         group by:Column#25, funcs:count(Column#26)->Column#21, funcs:firstrow(Column#27)->gharchive_dev.github_repos.created_at                                                 
+  └─IndexReader_11          1.00        1223042.39     root                                                                                                                         index:HashAgg_6                                                                                                                                                         
+    └─HashAgg_6             1.00        18345421.96    cop[tikv]                                                                                                                    group by:date_format(gharchive_dev.github_repos.created_at, "%Y-%m-%d"), funcs:count(1)->Column#26, funcs:firstrow(gharchive_dev.github_repos.created_at)->Column#27    
+      └─IndexRangeScan_9    55786.74    15560144.42    cop[tikv]    table:github_repos, index:idx_primary_language_created_at_repo_name(primary_language, created_at, repo_name)    range:["\x0f\xc0\x10\x1f\x0eJ\x10^" 2023-11-01 00:00:00,"\x0f\xc0\x10\x1f\x0eJ\x10^" 2023-12-31 00:00:00], keep order:false                                             

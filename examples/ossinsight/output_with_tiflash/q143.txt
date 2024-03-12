@@ -1,0 +1,36 @@
+Alias: q143
+Query: 
+/* questionId: 683692d6-5f33-426a-8b29-62b97371bb69 */ SELECT DATE_FORMAT(`created_at`, '%Y-%m-01') AS `t_month`, COUNT(*) AS `new_repos` FROM `github_repos` WHERE YEAR(`created_at`) >= 2017 GROUP BY `t_month` ORDER BY `t_month` ASC
+
+Original Cost: 3.41E+09
+Optimized Cost: 3.41E+09
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+Sort_6                                    2606694.40      3411109289.47     root                                  Column#22                                                                                                                                 
+└─TableReader_44                          2606694.40      614756699.60      root                                  MppVersion: 2, data:ExchangeSender_43                                                                                                     
+  └─ExchangeSender_43                     2606694.40      8957553020.68     mpp[tiflash]                          ExchangeType: PassThrough                                                                                                                 
+    └─Projection_9                        2606694.40      8957553020.68     mpp[tiflash]                          date_format(gharchive_dev.github_repos.created_at, %Y-%m-01)->Column#22, Column#21                                                        
+      └─Projection_39                     2606694.40      8956289295.23     mpp[tiflash]                          Column#21, gharchive_dev.github_repos.created_at                                                                                          
+        └─HashAgg_40                      2606694.40      8956264270.97     mpp[tiflash]                          group by:Column#33, funcs:sum(Column#34)->Column#21, funcs:firstrow(Column#35)->gharchive_dev.github_repos.created_at, stream_count: 8    
+          └─ExchangeReceiver_42           2606694.40      8948327335.86     mpp[tiflash]                          stream_count: 8                                                                                                                           
+            └─ExchangeSender_41           2606694.40      8807565838.26     mpp[tiflash]                          ExchangeType: HashPartition, Compression: FAST, Hash Cols: [name: Column#33, collate: utf8mb4_general_ci], stream_count: 8                
+              └─HashAgg_38                2606694.40      8807565838.26     mpp[tiflash]                          group by:Column#37, funcs:count(1)->Column#34, funcs:firstrow(Column#36)->Column#35                                                       
+                └─Projection_45           178517573.60    10174634986.39    mpp[tiflash]                          gharchive_dev.github_repos.created_at->Column#36, date_format(gharchive_dev.github_repos.created_at, %Y-%m-01)->Column#37                 
+                  └─Selection_28          178517573.60    8375213548.02     mpp[tiflash]                          ge(year(gharchive_dev.github_repos.created_at), 2017)                                                                                     
+                    └─TableFullScan_27    223146967.00    7839660827.22     mpp[tiflash]    table:github_repos    pushed down filter:empty, keep order:false                                                                                                
+
+===================== optimized plan =====================
+Sort_6                                    2606694.40      3411109289.47     root                                  Column#22                                                                                                                                 
+└─TableReader_54                          2606694.40      614756699.60      root                                  MppVersion: 2, data:ExchangeSender_53                                                                                                     
+  └─ExchangeSender_53                     2606694.40      8957553020.68     mpp[tiflash]                          ExchangeType: PassThrough                                                                                                                 
+    └─Projection_9                        2606694.40      8957553020.68     mpp[tiflash]                          date_format(gharchive_dev.github_repos.created_at, %Y-%m-01)->Column#22, Column#21                                                        
+      └─Projection_49                     2606694.40      8956289295.23     mpp[tiflash]                          Column#21, gharchive_dev.github_repos.created_at                                                                                          
+        └─HashAgg_50                      2606694.40      8956264270.97     mpp[tiflash]                          group by:Column#39, funcs:sum(Column#40)->Column#21, funcs:firstrow(Column#41)->gharchive_dev.github_repos.created_at, stream_count: 8    
+          └─ExchangeReceiver_52           2606694.40      8948327335.86     mpp[tiflash]                          stream_count: 8                                                                                                                           
+            └─ExchangeSender_51           2606694.40      8807565838.26     mpp[tiflash]                          ExchangeType: HashPartition, Compression: FAST, Hash Cols: [name: Column#39, collate: utf8mb4_general_ci], stream_count: 8                
+              └─HashAgg_48                2606694.40      8807565838.26     mpp[tiflash]                          group by:Column#43, funcs:count(1)->Column#40, funcs:firstrow(Column#42)->Column#41                                                       
+                └─Projection_55           178517573.60    10174634986.39    mpp[tiflash]                          gharchive_dev.github_repos.created_at->Column#42, date_format(gharchive_dev.github_repos.created_at, %Y-%m-01)->Column#43                 
+                  └─Selection_38          178517573.60    8375213548.02     mpp[tiflash]                          ge(year(gharchive_dev.github_repos.created_at), 2017)                                                                                     
+                    └─TableFullScan_37    223146967.00    7839660827.22     mpp[tiflash]    table:github_repos    pushed down filter:empty, keep order:false                                                                                                

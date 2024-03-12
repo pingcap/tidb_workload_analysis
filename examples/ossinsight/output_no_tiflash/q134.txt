@@ -1,0 +1,20 @@
+Alias: q134
+Query: 
+/* questionId: e5f366ef-7706-44e2-bb38-177015f3a84d */ SELECT `login` AS `user_login`, `followers` AS `followers` FROM `github_users` ORDER BY `followers` DESC LIMIT 10
+
+Original Cost: 3.25E+09
+Optimized Cost: 3.25E+09
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+TopN_7                    10.00          3249598084.85     root                               gharchive_dev.github_users.followers:desc, offset:0, count:10    
+└─TableReader_14          10.00          3249596125.21     root                               data:TopN_13                                                     
+  └─TopN_13               10.00          48743935898.59    cop[tikv]                          gharchive_dev.github_users.followers:desc, offset:0, count:10    
+    └─TableFullScan_12    95738728.00    32873880798.02    cop[tikv]    table:github_users    keep order:false                                                 
+
+===================== optimized plan =====================
+TopN_7                    10.00          3249598084.85     root                               gharchive_dev.github_users.followers:desc, offset:0, count:10    
+└─TableReader_14          10.00          3249596125.21     root                               data:TopN_13                                                     
+  └─TopN_13               10.00          48743935898.59    cop[tikv]                          gharchive_dev.github_users.followers:desc, offset:0, count:10    
+    └─TableFullScan_12    95738728.00    32873880798.02    cop[tikv]    table:github_users    keep order:false                                                 

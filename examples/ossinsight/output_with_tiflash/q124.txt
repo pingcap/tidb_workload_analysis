@@ -1,0 +1,23 @@
+Alias: q124
+Query: 
+/* questionId: 7704cb7f-0a82-4d8d-be34-14646692f848 */ SELECT repo_name, stars FROM github_repos WHERE primary_language = 'Elixir' ORDER BY stars DESC LIMIT 10
+
+Original Cost: 9.89E+08
+Optimized Cost: 3.06E+03
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_7                  10.00       988507394.57      root                                  gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars                            
+└─TopN_10                     10.00       988507392.58      root                                  gharchive_dev.github_repos.stars:desc, offset:0, count:10                                         
+  └─TableReader_22            10.00       988505472.93      root                                  MppVersion: 2, data:ExchangeSender_21                                                             
+    └─ExchangeSender_21       10.00       14827579212.02    mpp[tiflash]                          ExchangeType: PassThrough                                                                         
+      └─TopN_20               10.00       14827579212.02    mpp[tiflash]                          gharchive_dev.github_repos.stars:desc, offset:0, count:10                                         
+        └─TableFullScan_18    18480.00    14291879091.57    mpp[tiflash]    table:github_repos    pushed down filter:eq(gharchive_dev.github_repos.primary_language, "Elixir"), keep order:false    
+
+===================== optimized plan =====================
+Projection_7                 10.00     3061.18     root                                                                                                               gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars    
+└─Limit_11                   10.00     3059.18     root                                                                                                               offset:0, count:10                                                        
+  └─IndexReader_24           10.00     3059.18     root                                                                                                               index:Limit_23                                                            
+    └─Limit_23               10.00     40700.11    cop[tikv]                                                                                                          offset:0, count:10                                                        
+      └─IndexRangeScan_22    120.75    40700.11    cop[tikv]    table:github_repos, index:idx_primary_language_stars_repo_name(primary_language, stars, repo_name)    range:["Elixir","Elixir"], keep order:true, desc                          

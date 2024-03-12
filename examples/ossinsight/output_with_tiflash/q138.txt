@@ -1,0 +1,26 @@
+Alias: q138
+Query: 
+SELECT gr.repo_name, gr.stars, gr.description FROM github_repos gr WHERE YEAR(gr.created_at) = 2023 ORDER BY gr.stars DESC LIMIT 50
+
+Original Cost: 1.19E+09
+Optimized Cost: 5.93E+04
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_7                    50.00           1188358179.97     root                        gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.description    
+└─TopN_10                       50.00           1188358165.00     root                        gharchive_dev.github_repos.stars:desc, offset:0, count:50                                                         
+  └─TableReader_22              50.00           1188342353.58     root                        MppVersion: 2, data:ExchangeSender_21                                                                             
+    └─ExchangeSender_21         50.00           17825116273.72    mpp[tiflash]                ExchangeType: PassThrough                                                                                         
+      └─TopN_20                 50.00           17825116273.72    mpp[tiflash]                gharchive_dev.github_repos.stars:desc, offset:0, count:50                                                         
+        └─Selection_19          178517573.60    15407049810.63    mpp[tiflash]                eq(year(gharchive_dev.github_repos.created_at), 2023)                                                             
+          └─TableFullScan_18    223146967.00    14871497089.83    mpp[tiflash]    table:gr    pushed down filter:empty, keep order:false                                                                        
+
+===================== optimized plan =====================
+Projection_7                      50.00    59280.71    root                                                                    gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.description                                           
+└─Projection_28                   50.00    59245.78    root                                                                    gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.created_at, gharchive_dev.github_repos.description    
+  └─IndexLookUp_27                50.00    59225.82    root                                                                    limit embedded(offset:0, count:50)                                                                                                                       
+    ├─Limit_26(Build)             50.00    22251.53    cop[tikv]                                                               offset:0, count:50                                                                                                                                       
+    │ └─Selection_25              50.00    22251.53    cop[tikv]                                                               eq(year(gharchive_dev.github_repos.created_at), 2023)                                                                                                    
+    │   └─IndexFullScan_23        62.50    19132.78    cop[tikv]    table:gr, index:idx_stars_created_at(stars, created_at)    keep order:true, desc                                                                                                                                    
+    └─TableRowIDScan_24(Probe)    50.00    18149.89    cop[tikv]    table:gr                                                   keep order:false                                                                                                                                         

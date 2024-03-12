@@ -1,0 +1,26 @@
+Alias: q132
+Query: 
+/* questionId: 2e6abee8-f644-4775-944f-73574c33645b */ SELECT gr.repo_name AS repo_name, gr.stars AS stars, gr.primary_language AS primary_language FROM github_repos gr WHERE LOWER(gr.description) LIKE LOWER('%Libida for Her%') ORDER BY stars DESC LIMIT 10
+
+Original Cost: 1.12E+09
+Optimized Cost: 1.54E+04
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_7                    10.00           1123366878.60     root                        gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.primary_language    
+└─TopN_10                       10.00           1123366875.61     root                        gharchive_dev.github_repos.stars:desc, offset:0, count:10                                                              
+  └─TableReader_21              10.00           1123364823.96     root                        MppVersion: 2, data:ExchangeSender_20                                                                                  
+    └─ExchangeSender_20         10.00           16850468025.45    mpp[tiflash]                ExchangeType: PassThrough                                                                                              
+      └─TopN_19                 10.00           16850468025.45    mpp[tiflash]                gharchive_dev.github_repos.stars:desc, offset:0, count:10                                                              
+        └─Selection_18          178517573.60    15427213823.34    mpp[tiflash]                like(lower(gharchive_dev.github_repos.description), "%libida for her%", 92)                                            
+          └─TableFullScan_17    223146967.00    14891661102.54    mpp[tiflash]    table:gr    pushed down filter:empty, keep order:false                                                                             
+
+===================== optimized plan =====================
+Projection_7                          10.00    15374.32    root                                                                    gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.primary_language                                            
+└─Limit_12                            10.00    15371.32    root                                                                    offset:0, count:10                                                                                                                                             
+  └─Selection_26                      10.00    15371.32    root                                                                    like(lower(gharchive_dev.github_repos.description), "%libida for her%", 92)                                                                                    
+    └─Projection_25                   12.50    14747.57    root                                                                    gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.primary_language, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.description    
+      └─IndexLookUp_24                12.50    14742.58    root                                                                                                                                                                                                                                   
+        ├─IndexFullScan_22(Build)     12.50    4065.68     cop[tikv]    table:gr, index:idx_stars_created_at(stars, created_at)    keep order:true, desc                                                                                                                                          
+        └─TableRowIDScan_23(Probe)    12.50    4017.16     cop[tikv]    table:gr                                                   keep order:false                                                                                                                                               

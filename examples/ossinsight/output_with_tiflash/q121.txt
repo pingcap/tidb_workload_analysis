@@ -1,0 +1,26 @@
+Alias: q121
+Query: 
+/* questionId: a8776da3-9c02-41cc-a284-08e326a90b8d */ SELECT repo_name, stars FROM github_repos WHERE description LIKE '%AI%' ORDER BY stars DESC LIMIT 10
+
+Original Cost: 1.08E+09
+Optimized Cost: 1.47E+04
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_7                    10.00           1080929400.72     root                                  gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars    
+└─TopN_10                       10.00           1080929398.73     root                                  gharchive_dev.github_repos.stars:desc, offset:0, count:10                 
+  └─TableReader_22              10.00           1080927411.08     root                                  MppVersion: 2, data:ExchangeSender_21                                     
+    └─ExchangeSender_21         10.00           16213907536.25    mpp[tiflash]                          ExchangeType: PassThrough                                                 
+      └─TopN_20                 10.00           16213907536.25    mpp[tiflash]                          gharchive_dev.github_repos.stars:desc, offset:0, count:10                 
+        └─Selection_19          178517573.60    14790653350.14    mpp[tiflash]                          like(gharchive_dev.github_repos.description, "%AI%", 92)                  
+          └─TableFullScan_18    223146967.00    14255100629.34    mpp[tiflash]    table:github_repos    pushed down filter:empty, keep order:false                                
+
+===================== optimized plan =====================
+Projection_7                       10.00    14749.17    root                                                                              gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars                                            
+└─Limit_12                         10.00    14747.17    root                                                                              offset:0, count:10                                                                                                
+  └─Projection_27                  10.00    14747.17    root                                                                              gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.description    
+    └─IndexLookUp_26               10.00    14744.18    root                                                                                                                                                                                                
+      ├─IndexFullScan_23(Build)    12.50    4065.68     cop[tikv]    table:github_repos, index:idx_stars_created_at(stars, created_at)    keep order:true, desc                                                                                             
+      └─Selection_25(Probe)        10.00    4640.91     cop[tikv]                                                                         like(gharchive_dev.github_repos.description, "%AI%", 92)                                                          
+        └─TableRowIDScan_24        12.50    4017.16     cop[tikv]    table:github_repos                                                   keep order:false                                                                                                  

@@ -1,0 +1,26 @@
+Alias: q94
+Query: 
+/* questionId: 4e2dc2fe-027e-461a-b34e-42f5cfa8b95e */ SELECT gr.repo_name AS repo_name, gr.stars AS stars FROM github_repos gr WHERE LOWER(gr.description) LIKE LOWER('%generative%') AND LOWER(gr.description) LIKE LOWER('%AI%') ORDER BY stars DESC LIMIT 20
+
+Original Cost: 1.15E+09
+Optimized Cost: 3.20E+04
+Cost Reduction Ratio: 0.00
+
+
+===================== original plan =====================
+Projection_7                    20.00           1145198962.36     root                        gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars                                                                      
+└─TopN_10                       20.00           1145198958.36     root                        gharchive_dev.github_repos.stars:desc, offset:0, count:20                                                                                   
+  └─TableReader_21              20.00           1145193985.08     root                        MppVersion: 2, data:ExchangeSender_20                                                                                                       
+    └─ExchangeSender_20         20.00           17177902516.19    mpp[tiflash]                ExchangeType: PassThrough                                                                                                                   
+      └─TopN_19                 20.00           17177902516.19    mpp[tiflash]                gharchive_dev.github_repos.stars:desc, offset:0, count:20                                                                                   
+        └─Selection_18          178517573.60    15326206070.94    mpp[tiflash]                like(lower(gharchive_dev.github_repos.description), "%ai%", 92), like(lower(gharchive_dev.github_repos.description), "%generative%", 92)    
+          └─TableFullScan_17    223146967.00    14255100629.34    mpp[tiflash]    table:gr    pushed down filter:empty, keep order:false                                                                                                  
+
+===================== optimized plan =====================
+Projection_7                          20.00    31984.85    root                                                                    gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars                                                                      
+└─Limit_12                            20.00    31980.86    root                                                                    offset:0, count:20                                                                                                                          
+  └─Selection_26                      20.00    31980.86    root                                                                    like(lower(gharchive_dev.github_repos.description), "%ai%", 92), like(lower(gharchive_dev.github_repos.description), "%generative%", 92)    
+    └─Projection_25                   25.00    29485.86    root                                                                    gharchive_dev.github_repos.repo_name, gharchive_dev.github_repos.stars, gharchive_dev.github_repos.description                              
+      └─IndexLookUp_24                25.00    29478.37    root                                                                                                                                                                                                                
+        ├─IndexFullScan_22(Build)     25.00    8131.36     cop[tikv]    table:gr, index:idx_stars_created_at(stars, created_at)    keep order:true, desc                                                                                                                       
+        └─TableRowIDScan_23(Probe)    25.00    8034.32     cop[tikv]    table:gr                                                   keep order:false                                                                                                                            

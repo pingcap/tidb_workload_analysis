@@ -1,0 +1,20 @@
+Alias: q75
+Query: 
+/* questionId: cc5ba7b5-6926-4911-af27-e9c3847566c5 */ SELECT `repo_name`, `stars`, `forks` FROM `github_repos` ORDER BY `stars` DESC, `forks` DESC LIMIT 10
+
+Original Cost: 7.25E+09
+Optimized Cost: 7.25E+09
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+TopN_7                    10.00           7246881560.90      root                               gharchive_dev.github_repos.stars:desc, gharchive_dev.github_repos.forks:desc, offset:0, count:10    
+└─TableReader_14          10.00           7246879689.26      root                               data:TopN_13                                                                                        
+  └─TopN_13               10.00           108703191101.66    cop[tikv]                          gharchive_dev.github_repos.stars:desc, gharchive_dev.github_repos.forks:desc, offset:0, count:10    
+    └─TableFullScan_12    223146967.00    71713409757.25     cop[tikv]    table:github_repos    keep order:false                                                                                    
+
+===================== optimized plan =====================
+TopN_7                    10.00           7246881560.90      root                               gharchive_dev.github_repos.stars:desc, gharchive_dev.github_repos.forks:desc, offset:0, count:10    
+└─TableReader_14          10.00           7246879689.26      root                               data:TopN_13                                                                                        
+  └─TopN_13               10.00           108703191101.66    cop[tikv]                          gharchive_dev.github_repos.stars:desc, gharchive_dev.github_repos.forks:desc, offset:0, count:10    
+    └─TableFullScan_12    223146967.00    71713409757.25     cop[tikv]    table:github_repos    keep order:false                                                                                    

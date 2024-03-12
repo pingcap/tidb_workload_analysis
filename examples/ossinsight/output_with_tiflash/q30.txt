@@ -1,0 +1,30 @@
+Alias: q30
+Query: 
+SELECT DATE(github_repos.pushed_at) AS date, COUNT(*) AS commit_count FROM github_repos WHERE github_repos.primary_language = 'Rust' AND github_repos.pushed_at >= '2023-11-01' AND github_repos.pushed_at <= '2023-12-31' GROUP BY DATE(github_repos.pushed_at)
+
+Original Cost: 8.07E+08
+Optimized Cost: 4.38E+08
+Cost Reduction Ratio: 0.54
+
+
+===================== original plan =====================
+TableReader_41                          1.00    806719929.86      root                                  MppVersion: 2, data:ExchangeSender_40                                                                                                                                              
+└─ExchangeSender_40                     1.00    12100798912.67    mpp[tiflash]                          ExchangeType: PassThrough                                                                                                                                                          
+  └─Projection_6                        1.00    12100798912.67    mpp[tiflash]                          date(gharchive_dev.github_repos.pushed_at)->Column#22, Column#21                                                                                                                   
+    └─Projection_36                     1.00    12100798912.19    mpp[tiflash]                          Column#21, gharchive_dev.github_repos.pushed_at                                                                                                                                    
+      └─HashAgg_37                      1.00    12100798912.18    mpp[tiflash]                          group by:Column#33, funcs:sum(Column#34)->Column#21, funcs:firstrow(Column#35)->gharchive_dev.github_repos.pushed_at, stream_count: 8                                              
+        └─ExchangeReceiver_39           1.00    12100798837.13    mpp[tiflash]                          stream_count: 8                                                                                                                                                                    
+          └─ExchangeSender_38           1.00    12100798813.13    mpp[tiflash]                          ExchangeType: HashPartition, Compression: FAST, Hash Cols: [name: Column#33, collate: binary], stream_count: 8                                                                     
+            └─HashAgg_35                1.00    12100798813.13    mpp[tiflash]                          group by:Column#37, funcs:count(1)->Column#34, funcs:firstrow(Column#36)->Column#35                                                                                                
+              └─Projection_42           0.00    12100798739.94    mpp[tiflash]                          gharchive_dev.github_repos.pushed_at->Column#36, date(gharchive_dev.github_repos.pushed_at)->Column#37                                                                             
+                └─Selection_25          0.00    12100798739.93    mpp[tiflash]                          eq(gharchive_dev.github_repos.primary_language, "Rust")                                                                                                                            
+                  └─TableFullScan_24    2.20    10494140577.53    mpp[tiflash]    table:github_repos    pushed down filter:ge(gharchive_dev.github_repos.pushed_at, 2023-11-01 00:00:00.000000), le(gharchive_dev.github_repos.pushed_at, 2023-12-31 00:00:00.000000), keep order:false    
+
+===================== optimized plan =====================
+Projection_5                        1.00         438374840.61    root                                                                                                                         date(gharchive_dev.github_repos.pushed_at)->Column#22, Column#21                                                                              
+└─HashAgg_9                         1.00         438374830.53    root                                                                                                                         group by:Column#52, funcs:count(1)->Column#21, funcs:firstrow(Column#51)->gharchive_dev.github_repos.pushed_at                                
+  └─Projection_58                   0.00         438373312.89    root                                                                                                                         gharchive_dev.github_repos.pushed_at->Column#51, date(gharchive_dev.github_repos.pushed_at)->Column#52                                        
+    └─IndexLookUp_35                0.00         438373312.88    root                                                                                                                                                                                                                                                                       
+      ├─IndexRangeScan_32(Build)    223146.97    64697153.63     cop[tikv]    table:github_repos, index:idx_primary_language_repo_name_created_at(primary_language, repo_name, created_at)    range:["Rust","Rust"], keep order:false                                                                                                       
+      └─Selection_34(Probe)         0.00         93983477.06     cop[tikv]                                                                                                                    ge(gharchive_dev.github_repos.pushed_at, 2023-11-01 00:00:00.000000), le(gharchive_dev.github_repos.pushed_at, 2023-12-31 00:00:00.000000)    
+        └─TableRowIDScan_33         223146.97    71713409.76     cop[tikv]    table:github_repos                                                                                              keep order:false                                                                                                                              

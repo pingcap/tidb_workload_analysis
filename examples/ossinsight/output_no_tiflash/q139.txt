@@ -1,0 +1,24 @@
+Alias: q139
+Query: 
+/* questionId: 88cc66fc-012d-46a4-8e5d-5dd8c811231c */ SELECT gr.repo_name AS repo_name, CONCAT('https://github.com/', gr.repo_name) AS link FROM github_repos gr WHERE gr.primary_language = 'aframe' ORDER BY gr.stars DESC LIMIT 100
+
+Original Cost: 5.52E+09
+Optimized Cost: 4.40E+08
+Cost Reduction Ratio: 0.08
+
+
+===================== original plan =====================
+Projection_9                  100.00          5523283978.49     root                     gharchive_dev.github_repos.repo_name, concat(https://github.com/, gharchive_dev.github_repos.repo_name)->Column#23    
+└─TopN_10                     100.00          5523282970.51     root                     gharchive_dev.github_repos.stars:desc, offset:0, count:100                                                            
+  └─TableReader_18            100.00          5523247197.67     root                     data:TopN_17                                                                                                          
+    └─TopN_17                 100.00          82848656088.99    cop[tikv]                gharchive_dev.github_repos.stars:desc, offset:0, count:100                                                            
+      └─Selection_16          633.61          82848443410.55    cop[tikv]                eq(gharchive_dev.github_repos.primary_language, "aframe")                                                             
+        └─TableFullScan_15    223146967.00    71713409757.25    cop[tikv]    table:gr    keep order:false                                                                                                      
+
+===================== optimized plan =====================
+Projection_9                      100.00       440096751.84    root                                                                                                               gharchive_dev.github_repos.repo_name, concat(https://github.com/, gharchive_dev.github_repos.repo_name)->Column#23    
+└─TopN_11                         100.00       440095743.86    root                                                                                                               gharchive_dev.github_repos.stars:desc, offset:0, count:100                                                            
+  └─IndexLookUp_22                100.00       440059971.02    root                                                                                                                                                                                                                                     
+    ├─IndexRangeScan_19(Build)    223146.97    55621647.60     cop[tikv]    table:gr, index:idx_primary_language_created_at_repo_name(primary_language, created_at, repo_name)    range:["\x0e3\x0e\xb9\x0f\xc0\x0e3\x0f[\x0e\x8b","\x0e3\x0e\xb9\x0f\xc0\x0e3\x0f[\x0e\x8b"], keep order:false         
+    └─TopN_21(Probe)              100.00       145695592.02    cop[tikv]                                                                                                          gharchive_dev.github_repos.stars:desc, offset:0, count:100                                                            
+      └─TableRowIDScan_20         223146.97    71713409.76     cop[tikv]    table:gr                                                                                              keep order:false                                                                                                      

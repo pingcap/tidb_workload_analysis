@@ -1,0 +1,22 @@
+Alias: q134
+Query: 
+/* questionId: e5f366ef-7706-44e2-bb38-177015f3a84d */ SELECT `login` AS `user_login`, `followers` AS `followers` FROM `github_users` ORDER BY `followers` DESC LIMIT 10
+
+Original Cost: 4.20E+08
+Optimized Cost: 4.20E+08
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+TopN_9                      10.00          420009192.34     root                                  gharchive_dev.github_users.followers:desc, offset:0, count:10    
+└─TableReader_19            10.00          420007232.70     root                                  MppVersion: 2, data:ExchangeSender_18                            
+  └─ExchangeSender_18       10.00          6300105168.49    mpp[tiflash]                          ExchangeType: PassThrough                                        
+    └─TopN_17               10.00          6300105168.49    mpp[tiflash]                          gharchive_dev.github_users.followers:desc, offset:0, count:10    
+      └─TableFullScan_16    95738728.00    5536815884.24    mpp[tiflash]    table:github_users    keep order:false                                                 
+
+===================== optimized plan =====================
+TopN_9                      10.00          420009192.34     root                                  gharchive_dev.github_users.followers:desc, offset:0, count:10    
+└─TableReader_19            10.00          420007232.70     root                                  MppVersion: 2, data:ExchangeSender_18                            
+  └─ExchangeSender_18       10.00          6300105168.49    mpp[tiflash]                          ExchangeType: PassThrough                                        
+    └─TopN_17               10.00          6300105168.49    mpp[tiflash]                          gharchive_dev.github_users.followers:desc, offset:0, count:10    
+      └─TableFullScan_16    95738728.00    5536815884.24    mpp[tiflash]    table:github_users    keep order:false                                                 

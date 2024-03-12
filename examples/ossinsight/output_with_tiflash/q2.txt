@@ -1,0 +1,24 @@
+Alias: q2
+Query: 
+SELECT     COUNT(1) AS cnt,     MAX(created_at) AS latest_created_at,     UNIX_TIMESTAMP(MAX(created_at)) AS latest_timestamp FROM github_events
+
+Original Cost: 8.06E+09
+Optimized Cost: 8.06E+09
+Cost Reduction Ratio: 1.00
+
+
+===================== original plan =====================
+Projection_4                  1.00             8059013748.08      root                                   Column#34, Column#35, unix_timestamp(Column#35)->Column#36                                 
+└─HashAgg_40                  1.00             8059013737.90      root                                   funcs:count(Column#94)->Column#34, funcs:max(Column#95)->Column#35                         
+  └─TableReader_42            1.00             8059012200.34      root            partition:all          MppVersion: 2, data:ExchangeSender_41                                                      
+    └─ExchangeSender_41       1.00             120885182969.92    mpp[tiflash]                           ExchangeType: PassThrough                                                                  
+      └─HashAgg_9             1.00             120885182969.92    mpp[tiflash]                           funcs:count(1)->Column#94, funcs:max(gharchive_dev.github_events.created_at)->Column#95    
+        └─TableFullScan_39    2526854492.00    117246512428.80    mpp[tiflash]    table:github_events    keep order:false, PartitionTableScan:true                                                  
+
+===================== optimized plan =====================
+Projection_4                  1.00             8059013748.08      root                                   Column#34, Column#35, unix_timestamp(Column#35)->Column#36                                 
+└─HashAgg_40                  1.00             8059013737.90      root                                   funcs:count(Column#94)->Column#34, funcs:max(Column#95)->Column#35                         
+  └─TableReader_42            1.00             8059012200.34      root            partition:all          MppVersion: 2, data:ExchangeSender_41                                                      
+    └─ExchangeSender_41       1.00             120885182969.92    mpp[tiflash]                           ExchangeType: PassThrough                                                                  
+      └─HashAgg_9             1.00             120885182969.92    mpp[tiflash]                           funcs:count(1)->Column#94, funcs:max(gharchive_dev.github_events.created_at)->Column#95    
+        └─TableFullScan_39    2526854492.00    117246512428.80    mpp[tiflash]    table:github_events    keep order:false, PartitionTableScan:true                                                  
