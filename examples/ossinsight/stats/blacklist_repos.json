@@ -1,0 +1,49 @@
+{
+ "columns": {
+  "name": {
+   "histogram": {
+    "ndv": 5
+   },
+   "cm_sketch": {
+    "top_n": [
+     {
+      "data": "AVRoZS1SdW4t/1BoaWxvc29w/2h5LU9yZ2Fu/2l6YXRpb24v/3J1bgAAAAAA+g==",
+      "count": 1
+     },
+     {
+      "data": "AVdlTmVlZEhv/21lL1N1bW1h/3J5T2ZMb2Fu/1N1c3BlbnNp/29uAAAAAAAA+Q==",
+      "count": 1
+     },
+     {
+      "data": "AVdvbHNleUJh/25rV2l0bmVz/3MvcmVkaWZm/3VzaW9uAAAA/A==",
+      "count": 1
+     },
+     {
+      "data": "AWlsb3ZleGpw/y90cmlwLWNh/3JkAAAAAAAA+Q==",
+      "count": 1
+     },
+     {
+      "data": "AWxpZGFuZ3p6/3ovSG93LXRv/y1ydW4AAAAA+w==",
+      "count": 1
+     }
+    ],
+    "default_value": 0
+   },
+   "fm_sketch": null,
+   "stats_ver": 2,
+   "null_count": 0,
+   "tot_col_size": 141,
+   "last_update_version": 448325416101347331,
+   "correlation": 0.5
+  }
+ },
+ "indices": {},
+ "partitions": null,
+ "database_name": "gharchive_dev",
+ "table_name": "blacklist_repos",
+ "ext_stats": null,
+ "count": 5,
+ "modify_count": 0,
+ "version": 448325416101347331,
+ "is_historical_stats": false
+}
