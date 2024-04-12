@@ -17,8 +17,10 @@ Markers capture logical operators in query. See analyze.go for more details.
 """
 def analyze_one_query(sql):
         #few hacks to clean up SQL
-        sql = sql.replace('\n',' ')
-        sql = sql.strip()
+        sql = re.sub("-- metabase select"," select ",sql,flags = re.I) #remove comment prefix 
+        split_arguments = sql.split("[arguments:", 1)
+        if (len(split_arguments) == 2):
+            sql = split_arguments[0]
         key_string = (lib.analyze(sql.encode("utf-8"), True))
         key_string = json.loads(key_string.decode("utf-8"))
         if (len(key_string) == 0):
