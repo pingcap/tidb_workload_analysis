@@ -128,7 +128,7 @@ def s3stmt2sql(one_stmt_json):
         "SUMMARY_END_TIME": "from_unixtime(%d)" % d['end'],
         "DIGEST_TEXT": single_quote(d['normalized_sql']),
         "SAMPLE_USER": stmt_sample_user(d['auth_users']),
-        "QUERY_SAMPLE_TEXT": single_quote(d['sample_sql']),
+        "QUERY_SAMPLE_TEXT": single_quote(d['sample_sql'].replace("\n", "\t")),
         "AVG_LATENCY": d['sum_latency'] / d['exec_count'],
         "AVG_PARSE_LATENCY": d['sum_parse_latency'] / d['exec_count'],
         "AVG_COMPILE_LATENCY": d['sum_compile_latency'] / d['exec_count'],
@@ -168,9 +168,9 @@ def s3stmt2sql(one_stmt_json):
         "INDEX_NAMES": stmt_index_names(d['index_names']),
 
         # TODO
-        "BACKOFF_TYPES": '',
-        "PLAN_HINT": '',
-        "PLAN": '',
+        "BACKOFF_TYPES": single_quote(''),
+        "PLAN_HINT": single_quote(''),
+        "PLAN": single_quote(''),
         "MAX_REQUEST_UNIT_READ": 0,
         "MAX_REQUEST_UNIT_WRITE": 0,
         "MAX_QUEUED_RC_TIME": 0,
