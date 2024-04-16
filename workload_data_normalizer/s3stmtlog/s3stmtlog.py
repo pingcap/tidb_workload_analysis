@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS `STATEMENTS_SUMMARY` (
 """
 
 def single_quote(s):
-    return "'" + s.replace("'", "\\'") + "'"
+    return "'" + s.replace("'", "''").replace("\\''", "\\'") + "'"
 
 def stmt_sample_user(users):
     for u in users:
