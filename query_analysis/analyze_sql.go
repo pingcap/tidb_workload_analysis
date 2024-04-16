@@ -3,12 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+
 	"github.com/pingcap/tidb/parser"
 	"github.com/pingcap/tidb/parser/ast"
 	_ "github.com/pingcap/tidb/parser/test_driver"
 	_ "github.com/pingcap/tidb/pkg/types/parser_driver"
-	"os"
 )
+
 import "C"
 
 // column analysis visitor
