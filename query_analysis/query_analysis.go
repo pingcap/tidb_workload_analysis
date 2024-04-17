@@ -108,9 +108,9 @@ func readVsWriteReport(c *sql.Conn) {
 		writeTime = math.Ceil(writeTime) * 100 / 100
 		readMem = math.Ceil(readMem/1024/1024) * 100 / 100
 		writeMem = math.Ceil(writeMem/1024/1024) * 100 / 100
-		fmt.Printf("%-35s%-15s%-15s%-15s\n", "Query Type", "Frequency", "Total Time", "Total MB Memory")
-		fmt.Printf("%-35s%-15d%-15s%-15s\n", "Read", readFreq, fmt.Sprintf("%.2f", readTime), fmt.Sprintf("%.2f", readMem))
-		fmt.Printf("%-35s%-15d%-15s%-15s\n", "Write", writeFreq, fmt.Sprintf("%.2f", writeTime), fmt.Sprintf("%.2f", writeMem))
+		fmt.Printf("%-35s%-20s%-20s%-20s\n", "Query Type", "Frequency", "Total Time", "Total MB Memory")
+		fmt.Printf("%-35s%-20d%-20s%-20s\n", "Read", readFreq, fmt.Sprintf("%.2f", readTime), fmt.Sprintf("%.2f", readMem))
+		fmt.Printf("%-35s%-20d%-20s%-20s\n", "Write", writeFreq, fmt.Sprintf("%.2f", writeTime), fmt.Sprintf("%.2f", writeMem))
 		fmt.Println()
 	})
 }
@@ -148,9 +148,9 @@ func insertSelectVsInsertValuesReport(c *sql.Conn) {
 		insertSelectMem = math.Ceil(insertSelectMem/1024/1024) * 100 / 100
 		insertValuesMem = math.Ceil(insertValuesMem/1024/1024) * 100 / 100
 
-		fmt.Printf("%-35s%-15s%-15s%-15s\n", "Query Type", "Frequency", "Total Time", "Total MB Memory")
-		fmt.Printf("%-35s%-15d%-15s%-15s\n", "Insert Select", insertSelectFre, fmt.Sprintf("%.2f", insertSelectTime), fmt.Sprintf("%.2f", insertSelectMem))
-		fmt.Printf("%-35s%-15d%-15s%-15s\n", "Insert Values", insertValuesFre, fmt.Sprintf("%.2f", insertValuesTime), fmt.Sprintf("%.2f", insertValuesMem))
+		fmt.Printf("%-35s%-20s%-20s%-20s\n", "Query Type", "Frequency", "Total Time", "Total MB Memory")
+		fmt.Printf("%-35s%-20d%-20s%-20s\n", "Insert Select", insertSelectFre, fmt.Sprintf("%.2f", insertSelectTime), fmt.Sprintf("%.2f", insertSelectMem))
+		fmt.Printf("%-35s%-20d%-20s%-20s\n", "Insert Values", insertValuesFre, fmt.Sprintf("%.2f", insertValuesTime), fmt.Sprintf("%.2f", insertValuesMem))
 		fmt.Println()
 	})
 }
