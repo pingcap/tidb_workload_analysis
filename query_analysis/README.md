@@ -5,75 +5,74 @@ This tool examines the structure of workload queries. This analysis serves both 
 
 ## How to run the tool
 ```
-python3 query_analysis.py --test_database <querylog_database>
+go run query_analysis.go --test_database <querylog_database>
 ```
 
 ## Prerequisites 
-- python3 should be installed on the system
+- Golang should be installed on the system
 - Need input database in sqlite format that has a table called slowlog. slowlog table
   can be constructed from slowlog using O11 tool. 
 - Need to install sqlite3 since the tool uses it to access the log data. 
 
 ## Sample test
-We have a sample test of 10,000 queries in sample_data/slowlog.sql in sqlite format.
+We have a sample test of 10,000 queries in data_normalizer/testdata/s3stmtlog_10000.sql in sqlite format.
 You can create a sqlite test database from the sample data and then run the tool on it.
  
 ```
-sqlite3 testDB < sample_data/slowlog.sql 
-python3 query_analysis.py --test_database sample_data/testDB
+sqlite3 testDB < data_normalizer/testdata/s3stmtlog_10000.sql 
+go run query_analysis.go --test_database testDB
 ```
 
 ## Sample result
 The result from the sample test above is listed below. UNKNOWN represents the cases
 we could not parse the SQL. Further work is needed to fix the logging code.
 ```
-Query Type                          Frequency 
-SCAN                                3280      
-INSERT_VALUES                       3209      
-AGGREGATE_SCAN_NO_GROUPBY           1477      
-AGGREGATE_JOIN_GROUPBY              732       
-UNKNOWN                             407       
-DELETE                              355       
-AGGREGATE_SCAN_GROUPBY              254       
-SYSTEM                              220       
-AGGREGATE_JOIN_NO_GROUPBY           54        
-UPDATE                              10        
-JOIN_NO_AGGREGATE                   2         
+Query Type                         Frequency
+INSERT_VALUES                      27294
+SCAN                               12427
+UNKNOWN                            3129
+AGGREGATE_SCAN_NO_GROUPBY          1573
+SYSTEM                             1253
+AGGREGATE_SCAN_GROUPBY             673
+AGGREGATE_JOIN_NO_GROUPBY          205
+JOIN_NO_AGGREGATE                  178
+AGGREGATE_JOIN_GROUPBY             126
+UPDATE                             56
+DELETE                             43
+EXPLAIN                            1
 
+Query Type                         Total Query Time in Seconds
+INSERT_VALUES                      731208265312.00
+AGGREGATE_SCAN_NO_GROUPBY          654343275078.00
+UNKNOWN                            145661868391.00
+SCAN                               86556227451.00
+DELETE                             53140982570.00
+AGGREGATE_SCAN_GROUPBY             37408239696.00
+AGGREGATE_JOIN_GROUPBY             21250328873.00
+AGGREGATE_JOIN_NO_GROUPBY          5766394256.00
+JOIN_NO_AGGREGATE                  1503911970.00
+SYSTEM                             504438257.00
+UPDATE                             457730456.00
+EXPLAIN                            3383641.00
 
-Query Type                          Total Query Time in Seconds
-AGGREGATE_SCAN_NO_GROUPBY           5940.73             
-UNKNOWN                             1216.44             
-INSERT_VALUES                       1174.3              
-AGGREGATE_JOIN_GROUPBY              930.78              
-SCAN                                380.37              
-DELETE                              345.67              
-AGGREGATE_SCAN_GROUPBY              336.01              
-AGGREGATE_JOIN_NO_GROUPBY           2.72                
-JOIN_NO_AGGREGATE                   0.78                
-SYSTEM                              0.18                
-UPDATE                              0.06                
+Query Type                         Total MB Memory
+INSERT_VALUES                      4220371801.00
+DELETE                             963206076.00
+SCAN                               350406301.00
+UNKNOWN                            324431085.00
+AGGREGATE_JOIN_GROUPBY             308020146.00
+AGGREGATE_SCAN_GROUPBY             237963712.00
+AGGREGATE_JOIN_NO_GROUPBY          232208935.00
+JOIN_NO_AGGREGATE                  120207381.00
+AGGREGATE_SCAN_NO_GROUPBY          69908415.00
+SYSTEM                             37789696.00
+UPDATE                             848408.00
+EXPLAIN                            0.00
 
+Query Type                         Frequency           Total Time          Total MB Memory     
+Read                               15183               806831760965.00     1258.00             
+Write                              31775               930973284986.00     5290.00             
 
-Query Type                          Total MB Memory     
-INSERT_VALUES                       8991.0              
-AGGREGATE_JOIN_GROUPBY              7240.000000000001   
-UNKNOWN                             6534.0              
-DELETE                              6201.0              
-SCAN                                2077.0              
-AGGREGATE_SCAN_GROUPBY              73.0                
-AGGREGATE_JOIN_NO_GROUPBY           48.0                
-AGGREGATE_SCAN_NO_GROUPBY           46.0                
-JOIN_NO_AGGREGATE                   34.0                
-SYSTEM                              1.0                 
-UPDATE                              1.0                 
-
-
-Query Type                          Frequency       Total Time      Total MB Memory
-Read                                5782            7587.0          9513.0         
-Write                               3591            1525.0          15193.0        
-
-
-Query Type                          Frequency       Total Time      Total MB Memory
-insert_select                       17              5.0             2.0            
-insert_values                       3209            1175.0          8991.0         
+Query Type                         Frequency           Total Time          Total MB Memory     
+Insert Select                      0                   0.00                0.00                
+Insert Values                      27294               731208265312.00     4025.00
