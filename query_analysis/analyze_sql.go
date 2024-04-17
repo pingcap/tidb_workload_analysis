@@ -2,9 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"os"
-
 	"github.com/pingcap/parser"
 	"github.com/pingcap/parser/ast"
 	_ "github.com/pingcap/tidb/types/parser_driver"
@@ -187,14 +184,14 @@ func analyze(sql *C.char, fulllist bool) *C.char {
 	return C.CString(keys)
 }
 
-// For unit testing this module.
-func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("usage: typeAnalysis 'SQL statement'")
-		return
-	}
-	sql := os.Args[1]
-
-	result := analyze_driver(sql, true)
-	print("\n result = ", result)
-}
+//// For unit testing this module.
+//func main() {
+//	if len(os.Args) != 2 {
+//		fmt.Println("usage: typeAnalysis 'SQL statement'")
+//		return
+//	}
+//	sql := os.Args[1]
+//
+//	result := analyze_driver(sql, true)
+//	print("\n result = ", result)
+//}
