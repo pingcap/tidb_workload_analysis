@@ -15,12 +15,16 @@ go run query_analysis.go --test_database <querylog_database>
 - Need to install sqlite3 since the tool uses it to access the log data. 
 
 ## Sample test
-We have a sample test of 10,000 queries in data_normalizer/testdata/s3stmtlog_10000.sql in sqlite format.
-You can create a sqlite test database from the sample data and then run the tool on it.
- 
+We have some sample data in `data_normalizer/testdata`, you can use that to test the tool.
+
 ```
-sqlite3 testDB < data_normalizer/testdata/s3stmtlog_10000.sql 
-go run query_analysis.go --test_database testDB
+# example 1
+go run query_analysis.go --test_database data_normalizer/testdata/s3stmtlog_1000
+
+# example 2
+xd -dk data_normalizer/testdata/s3stmtlog_100000.log.xz
+sqlite3 s3stmtlog_100000 < data_normalizer/testdata/s3stmtlog_100000.sql
+go run query_analysis.go --test_database data_normalizer/testdata/s3stmtlog_100000
 ```
 
 ## Sample result
