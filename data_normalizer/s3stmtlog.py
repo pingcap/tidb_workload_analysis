@@ -1,5 +1,6 @@
 from schema import statement_summary_schema
 import json
+import argparse
 import os
 
 def single_quote(s):
@@ -93,6 +94,13 @@ def s3stmtfile2sql(file):
     if skip_cnt > 0:
         print("skip %d lines" % skip_cnt)
 
-# s3stmtfile2sql("./testdata/s3stmtlog_10.log")
-# s3stmtfile2sql("./testdata/s3stmtlog_100.log")
-s3stmtfile2sql("./testdata/s3stmtlog_10000.log")
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--s3log')
+    args = parser.parse_args()
+    s3log = args.s3log
+    s3stmtfile2sql(s3log)
+    
+
+if __name__ == '__main__':
+    main()

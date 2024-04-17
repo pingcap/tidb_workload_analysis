@@ -13,3 +13,5 @@ index_advisor/vendor
 index_advisor/data
 index_advisor/result
 data_normalizer/testdata/s3stmtlog_100000.log
+data_normalizer/testdata/s3stmtlog_100000
+data_normalizer/testdata/s3stmtlog_100000.sql
