@@ -9,7 +9,7 @@ import re
 import math
 
 lib = ctypes.CDLL('./analyze.so')
-lib.analyze.restype = ctypes.c_char_p
+# lib.analyze.restype = ctypes.c_char_p
 
 """
 Mainly calls analyze.so library to get list of markers for a SQL query.
@@ -233,7 +233,7 @@ For each unqiue query, we compute total frequency, total compute and query type.
  - Frequency, compute time and memory of insert values vs insert select.
 insert_select_vs_insert_values_report(cur)
 """
-def analyze_queries(con, data_source):
+def analyze_queries(con):
         con.create_function("analyzeOneQuery", 1, analyze_one_query)
         con.create_function("numberOfJoins", 1, number_of_joins)
         con.create_function("queryType", 1, query_type)
@@ -261,40 +261,18 @@ def analyze_queries(con, data_source):
                 total_mem, max_mem, min_mem,
                 query_markers, number_of_joins, query_type
             )
-            SELECT digest, max(sql_statement), count(*) as frequency,
-                   sum(CAST(query_time as decimal)) as total_query_time,
-                   max(CAST(query_time as decimal)) as max_query_time,
-                   min(CAST(query_time as decimal)) as min_query_time,
-                   sum(CAST(mem_max as decimal)) as total_mem,
-                   max(CAST(mem_max as decimal)) as max_mem,
-                   min(CAST(mem_max as decimal)) as min_mem,
-                   analyzeOneQuery(sql_statement),
-                   numberOfJoins(analyzeOneQuery(sql_statement)),
-                   queryType(analyzeOneQuery(sql_statement))
-            FROM slowlog
-            GROUP BY digest 
-            order by max_query_time desc
-        """
-        if data_source.lower() == "statements-summary":
-            insert_statement = """
-                INSERT INTO unique_queries(
-                    digest, sql_statement, frequency,
-                    total_query_time, max_query_time, min_query_time,
-                    total_mem, max_mem, min_mem,
-                    query_markers, number_of_joins, query_type
-                )
-                SELECT digest, max(query_sample_text), sum(exec_count) as frequency,
-                   sum(CAST(sum_latency as decimal)) as total_query_time,
-                   max(CAST(max_latency as decimal)) as max_query_time,
-                   min(CAST(min_latency as decimal)) as min_query_time,
-                   sum(CAST((avg_mem*exec_count) as decimal)) as total_mem,
-                   max(CAST(max_mem as decimal)) as max_mem,
-                   min(CAST(avg_mem as decimal)) as min_mem,
-                   analyzeOneQuery(query_sample_text),
-                   numberOfJoins(analyzeOneQuery(query_sample_text)),
-                   queryType(analyzeOneQuery(query_sample_text))
-                FROM statements_summary
-                GROUP BY digest
+            SELECT digest, max(query_sample_text), sum(exec_count) as frequency,
+                sum(CAST(sum_latency as decimal)) as total_query_time,
+                max(CAST(max_latency as decimal)) as max_query_time,
+                min(CAST(min_latency as decimal)) as min_query_time,
+                sum(CAST((avg_mem*exec_count) as decimal)) as total_mem,
+                max(CAST(max_mem as decimal)) as max_mem,
+                min(CAST(avg_mem as decimal)) as min_mem,
+                analyzeOneQuery(query_sample_text),
+                numberOfJoins(analyzeOneQuery(query_sample_text)),
+                queryType(analyzeOneQuery(query_sample_text))
+            FROM statements_summary
+            GROUP BY digest
             """
 
         cur.execute(insert_statement)
@@ -311,10 +289,8 @@ Also, check if the sqlite database has a table called slowlog.
 def main():
     parser = argparse.ArgumentParser(description='Workload analysis.')
     parser.add_argument('--test_database',  help='sqllite name with log data')
-    parser.add_argument('--data_source', help='where the workload data is from, "slow-log" or "statements-summary"')
     args = parser.parse_args()
     test_database = args.test_database
-    data_source = args.data_source
 
     if test_database != "":
         try:
@@ -324,11 +300,11 @@ def main():
             print("\n incorrect database name:",test_database)
             sys.exit()
         cur = con.cursor()
-        listOfTables = cur.execute("""SELECT name FROM sqlite_master WHERE type='table' AND name='slowlog'; """).fetchall()
+        listOfTables = cur.execute("""SELECT name FROM sqlite_master WHERE type='table' AND name='STATEMENTS_SUMMARY'; """).fetchall()
         if listOfTables == []:
-            print('slowlog table is missing')
+            print('STATEMENTS_SUMMARY table is missing')
         else:
-            analyze_queries(con, data_source)
+            analyze_queries(con)
             con.commit()
         con.close()
     else:
