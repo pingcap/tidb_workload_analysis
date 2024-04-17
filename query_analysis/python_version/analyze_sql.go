@@ -1,4 +1,4 @@
-package main
+package python_version
 
 import (
 	"encoding/json"
