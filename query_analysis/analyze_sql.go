@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pingcap/tidb/pkg/parser"
-	"github.com/pingcap/tidb/pkg/parser/ast"
-	//_ "github.com/pingcap/tidb/pkg/types/parser_driver"
+	"github.com/pingcap/parser"
+	"github.com/pingcap/parser/ast"
+	_ "github.com/pingcap/tidb/types/parser_driver"
 )
 
 import "C"
@@ -63,7 +63,7 @@ func (v *typeAnalysis) analyzeTypes(node ast.Node) ([]string, bool) {
 	case *ast.ExplainStmt, *ast.ExplainForStmt:
 		return []string{"Explain"}, true
 	case *ast.ShowStmt, *ast.SetStmt, *ast.UseStmt,
-		*ast.BeginStmt, *ast.CommitStmt, *ast.SavepointStmt, *ast.ReleaseSavepointStmt,
+		*ast.BeginStmt, *ast.CommitStmt,
 		*ast.RollbackStmt, *ast.CreateUserStmt, *ast.SetPwdStmt:
 		return []string{"System"}, true
 	case *ast.AnalyzeTableStmt:
