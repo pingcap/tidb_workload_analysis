@@ -39,14 +39,14 @@ func query(c *sql.Conn, sql string, drainer func(*sql.Rows)) {
 func reportByFrequency(c *sql.Conn) {
 	q := `select query_type, sum(frequency) from unique_queries group by query_type order by sum(frequency) desc`
 	query(c, q, func(r *sql.Rows) {
-		fmt.Printf("Query Type\t\t\tFrequency\n")
+		fmt.Printf("%-35s%s\n", "Query Type", "Frequency")
 		var queryType string
 		var frequency int
 		for r.Next() {
 			if err := r.Scan(&queryType, &frequency); err != nil {
 				fatal("scan failed: " + err.Error())
 			}
-			fmt.Printf("%s\t\t%d\n", queryType, frequency)
+			fmt.Printf("%-35s%d\n", queryType, frequency)
 		}
 		fmt.Println()
 	})
@@ -66,14 +66,14 @@ func reportByQueryResource(c *sql.Conn, timeOrMem string) {
 	}
 
 	query(c, q, func(r *sql.Rows) {
-		fmt.Printf("%s\t\t\t%s\n", col1, col2)
+		fmt.Printf("%-35s%s\n", col1, col2)
 		var queryType string
 		var total float64
 		for r.Next() {
 			if err := r.Scan(&queryType, &total); err != nil {
 				fatal("scan failed: " + err.Error())
 			}
-			fmt.Printf("%s\t\t\t%.2f\n", queryType, total)
+			fmt.Printf("%-35s%.2f\n", queryType, total)
 		}
 		fmt.Println()
 	})
@@ -108,9 +108,50 @@ func readVsWriteReport(c *sql.Conn) {
 		writeTime = math.Ceil(writeTime) * 100 / 100
 		readMem = math.Ceil(readMem/1024/1024) * 100 / 100
 		writeMem = math.Ceil(writeMem/1024/1024) * 100 / 100
-		fmt.Printf("Query Type\t\t\tFrequency\t\t\tTotal Time\t\t\tTotal MB Memory\n")
-		fmt.Printf("Read\t\t\t%d\t\t\t%.2f\t\t\t%.2f\n", readFreq, readTime, readMem)
-		fmt.Printf("Write\t\t\t%d\t\t\t%.2f\t\t\t%.2f\n", writeFreq, writeTime, writeMem)
+		fmt.Printf("%-35s%-15s%-15s%-15s\n", "Query Type", "Frequency", "Total Time", "Total MB Memory")
+		fmt.Printf("%-35s%-15d%-15s%-15s\n", "Read", readFreq, fmt.Sprintf("%.2f", readTime), fmt.Sprintf("%.2f", readMem))
+		fmt.Printf("%-35s%-15d%-15s%-15s\n", "Write", writeFreq, fmt.Sprintf("%.2f", writeTime), fmt.Sprintf("%.2f", writeMem))
+		fmt.Println()
+	})
+}
+
+func insertSelectVsInsertValuesReport(c *sql.Conn) {
+	q := `select query_type, frequency, total_query_time, total_mem  
+            from unique_queries
+            where query_markers like '%Insert%'`
+
+	query(c, q, func(r *sql.Rows) {
+		var insertSelectFre, insertValuesFre int
+		var insertSelectTime, insertValuesTime float64
+		var insertSelectMem, insertValuesMem float64
+
+		for r.Next() {
+			var queryType string
+			var frequency int
+			var totalQueryTime, totalMem float64
+			err := r.Scan(&queryType, &frequency, &totalQueryTime, &totalMem)
+			if err != nil {
+				fatal("scan failed: " + err.Error())
+			}
+			if strings.Contains(strings.ToLower(queryType), "insert_values") {
+				insertValuesFre += frequency
+				insertValuesTime += totalQueryTime
+				insertValuesMem += totalMem
+			} else {
+				insertSelectFre += frequency
+				insertSelectTime += totalQueryTime
+				insertSelectMem += totalMem
+			}
+		}
+		insertSelectTime = math.Ceil(insertSelectTime) * 100 / 100
+		insertValuesTime = math.Ceil(insertValuesTime) * 100 / 100
+		insertSelectMem = math.Ceil(insertSelectMem/1024/1024) * 100 / 100
+		insertValuesMem = math.Ceil(insertValuesMem/1024/1024) * 100 / 100
+
+		fmt.Printf("%-35s%-15s%-15s%-15s\n", "Query Type", "Frequency", "Total Time", "Total MB Memory")
+		fmt.Printf("%-35s%-15d%-15s%-15s\n", "Insert Select", insertSelectFre, fmt.Sprintf("%.2f", insertSelectTime), fmt.Sprintf("%.2f", insertSelectMem))
+		fmt.Printf("%-35s%-15d%-15s%-15s\n", "Insert Values", insertValuesFre, fmt.Sprintf("%.2f", insertValuesTime), fmt.Sprintf("%.2f", insertValuesMem))
+		fmt.Println()
 	})
 }
 
@@ -152,6 +193,7 @@ func analyzeQueries(c *sql.Conn) {
 	reportByQueryResource(c, "time")
 	reportByQueryResource(c, "memory")
 	readVsWriteReport(c)
+	insertSelectVsInsertValuesReport(c)
 }
 
 func analyzeOneQuery(sql string) string {
