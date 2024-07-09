@@ -36,9 +36,9 @@ type WhatIfOptimizer interface {
 	CreateHypoIndex(index utils.Index) error // create a hypothetical index
 	DropHypoIndex(index utils.Index) error   // drop a hypothetical index
 
-	ExplainQ(q utils.Query) (plan utils.Plan, err error)      // return the execution plan of the specified query
-	Explain(query string) (plan utils.Plan, err error)        // return the execution plan of the specified query
-	ExplainAnalyze(query string) (plan utils.Plan, err error) // return the execution plan of the specified query with analyze
+	ExplainQ(q utils.Query, hypoIndexes ...utils.Index) (plan utils.Plan, err error) // return the execution plan of the specified query
+	Explain(query string) (plan utils.Plan, err error)                               // return the execution plan of the specified query
+	ExplainAnalyze(query string) (plan utils.Plan, err error)                        // return the execution plan of the specified query with analyze
 
 	ResetStats()                 // reset the statistics
 	Stats() WhatIfOptimizerStats // return the statistics

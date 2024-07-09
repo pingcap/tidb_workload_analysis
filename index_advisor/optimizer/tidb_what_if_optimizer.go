@@ -123,9 +123,16 @@ func (o *TiDBWhatIfOptimizer) ExplainQ(query utils.Query) (plan utils.Plan, err 
 }
 
 // Explain returns the execution plan of the specified query.
-func (o *TiDBWhatIfOptimizer) Explain(query string) (plan utils.Plan, err error) {
+func (o *TiDBWhatIfOptimizer) Explain(query string, hypoIndexes ...utils.Index) (plan utils.Plan, err error) {
 	defer o.recordStats(time.Now(), &o.stats.GetCostTime, &o.stats.GetCostCount)
-	result, err := o.Query("explain format = 'verbose' " + query)
+	selectIdx := strings.Index(strings.ToLower(query), "select")
+	if selectIdx == -1 {
+		return nil, fmt.Errorf("only support select statement, find %v instead", query)
+	}
+	selectIdx += len("select")
+	hint := hypoIndexHint(hypoIndexes...)
+	query = "explain format='verbose' " + query[:selectIdx] + hint + query[selectIdx:] // TODO: set fix-control
+	result, err := o.Query(query)
 	if err != nil {
 		return utils.Plan{}, err
 	}
@@ -164,4 +171,22 @@ func (o *TiDBWhatIfOptimizer) ExplainAnalyze(query string) (plan utils.Plan, err
 // SetDebug sets the debug flag.
 func (o *TiDBWhatIfOptimizer) SetDebug(flag bool) {
 	o.debugFlag = flag
+}
+
+func hypoIndexHint(hypoIndexes ...utils.Index) string {
+	hypoIndexHints := make([]string, 0, len(hypoIndexes))
+	for _, index := range hypoIndexes {
+		cols := ""
+		for _, col := range index.Columns {
+			if cols != "" {
+				cols += ", "
+			}
+			cols += col.ColumnName
+		}
+
+		hypoIndexHints = append(hypoIndexHints,
+			fmt.Sprintf("HYPO_INDEX(%v.%v, %v, %v)",
+				index.SchemaName, index.TableName, index.IndexName, cols))
+	}
+	return fmt.Sprintf(" /*+ %v */ ", strings.Join(hypoIndexHints, ","))
 }

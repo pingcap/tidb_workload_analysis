@@ -67,28 +67,13 @@ func evaluateIndexConfCostConcurrently(info utils.WorkloadInfo, optimizers []opt
 
 // evaluateIndexConfCost evaluates the workload cost under the given indexes.
 func evaluateIndexConfCost(info utils.WorkloadInfo, optimizer optimizer.WhatIfOptimizer, indexes utils.Set[utils.Index]) (utils.IndexConfCost, error) {
-	failedIndexes := utils.NewSet[utils.Index]()
-	for _, index := range indexes.ToList() {
-		if err := optimizer.CreateHypoIndex(index); err != nil {
-			utils.Warningf("create %v failed: %v", index.Key(), err)
-			failedIndexes.Add(index)
-		}
-	}
 	var workloadCost float64
 	for _, sql := range info.Queries.ToList() { // TODO: run them concurrently to save time
-		p, err := optimizer.ExplainQ(sql)
+		p, err := optimizer.ExplainQ(sql, indexes.ToList()...)
 		if err != nil {
 			return utils.IndexConfCost{}, err
 		}
 		workloadCost += p.PlanCost() * float64(sql.Frequency)
-	}
-	for _, index := range indexes.ToList() {
-		if failedIndexes.Contains(index) {
-			continue
-		}
-		if err := optimizer.DropHypoIndex(index); err != nil {
-			return utils.IndexConfCost{}, err
-		}
 	}
 	var totCols int
 	var keys []string
