@@ -148,17 +148,17 @@ How it work:
 }
 
 func startTiDB(ver string) (*utils.LocalTiDBServer, optimizer.WhatIfOptimizer, error) {
-	s, err := utils.StartLocalTiDBServer(ver)
+	//s, err := utils.StartLocalTiDBServer(ver)
+	//if err != nil {
+	//	return nil, nil, err
+	//}
+
+	utils.Infof("connect to %s", "root:@tcp(127.0.0.1:4000)/test")
+	db, err := optimizer.NewTiDBWhatIfOptimizer("root:@tcp(127.0.0.1:4000)/test") // the DB may not exist yet
 	if err != nil {
 		return nil, nil, err
 	}
-
-	utils.Infof("connect to %s", s.DSN())
-	db, err := optimizer.NewTiDBWhatIfOptimizer(s.DSN()) // the DB may not exist yet
-	if err != nil {
-		return s, nil, err
-	}
-	return s, db, nil
+	return nil, db, nil
 }
 
 func outputAdviseResult(indexes utils.Set[utils.Index], workload utils.WorkloadInfo, optimizer optimizer.WhatIfOptimizer, savePath string) error {

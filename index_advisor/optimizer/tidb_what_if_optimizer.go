@@ -132,6 +132,7 @@ func (o *TiDBWhatIfOptimizer) Explain(query string, hypoIndexes ...utils.Index) 
 	selectIdx += len("select")
 	hint := hypoIndexHint(hypoIndexes...)
 	query = "explain format='verbose' " + query[:selectIdx] + hint + query[selectIdx:] // TODO: set fix-control
+	fmt.Println(">>>>>>>>> query >>> ", query)
 	result, err := o.Query(query)
 	if err != nil {
 		return utils.Plan{}, err
